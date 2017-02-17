@@ -636,3 +636,7 @@ if (isset($_SERVER['DEVDESKTOP_DRUPAL_SETTINGS_DIR']) && file_exists($_SERVER['D
   require $_SERVER['DEVDESKTOP_DRUPAL_SETTINGS_DIR'] . '/cld_devcloud_iiedmulti_dev_biocultural.inc';
 }
 // </DDSETTINGS>
+
+if (file_exists('/var/www/site-php')) {
+    require('/var/www/site-php/iiedmulti/biocultural-settings.inc');
+}
