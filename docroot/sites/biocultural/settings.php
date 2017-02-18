@@ -633,6 +633,7 @@ if (isset($conf['memcache_servers'])) {
   $conf['cache_backends'][] = './sites/all/modules/memcache/memcache.inc';
   $conf['cache_default_class'] = 'MemCacheDrupal';
   $conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
+  $conf['memcache_key_prefix'] = $conf['acquia_hosting_site_info']['db']['name'] . '_';
 }
 
 // <DDSETTINGS>
