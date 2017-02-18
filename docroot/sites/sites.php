@@ -55,4 +55,5 @@
  */
 
 $sites['bch-dev.ac.iiedlist.org'] = 'biocultural';
-
+$sites['bch-stage.ac.iiedlist.org'] = 'biocultural';
+$sites['biocultural.iied.org'] = 'biocultural';
