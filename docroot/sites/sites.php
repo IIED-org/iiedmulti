@@ -54,8 +54,8 @@
  * @see http://drupal.org/documentation/install/multi-site
  */
 
-$sites['bch-dev.ac.iiedlist.org'] = 'biocultural';
-$sites['bch-stage.ac.iiedlist.org'] = 'biocultural';
+$sites['bch-dev.ac.iied.org'] = 'biocultural';
+$sites['bch-stage.ac.iied.org'] = 'biocultural';
 $sites['biocultural.iied.org'] = 'biocultural';
-$sites['bch.ac.iiedlist.org'] = 'biocultural';
+$sites['bch.ac.iied.org'] = 'biocultural';
 
