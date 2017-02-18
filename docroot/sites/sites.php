@@ -59,3 +59,9 @@ $sites['bch-stage.ac.iied.org'] = 'biocultural';
 $sites['bch.ac.iied.org'] = 'biocultural';
 $sites['biocultural.iied.org'] = 'biocultural';
 
+$sites['shapingsustainablemarkets.iied.org'] = 'ssm';
+$sites['ssm.ac.iied.org'] = 'ssm';
+$sites['ssm-dev.ac.iied.org'] = 'ssm';
+$sites['ssm-stage.ac.iied.org'] = 'ssm';
+
+
