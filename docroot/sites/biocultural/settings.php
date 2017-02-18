@@ -629,12 +629,6 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  */
 # $conf['allow_css_double_underscores'] = TRUE;
 
-if (isset($conf['memcache_servers'])) {
-  $conf['cache_backends'][] = './sites/all/modules/memcache/memcache.inc';
-  $conf['cache_default_class'] = 'MemCacheDrupal';
-  $conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
-  $conf['memcache_key_prefix'] = $conf['acquia_hosting_site_info']['db']['name'] . '_';
-}
 
 // <DDSETTINGS>
 // Please don't edit anything between <DDSETTINGS> tags.
@@ -646,4 +640,10 @@ if (isset($_SERVER['DEVDESKTOP_DRUPAL_SETTINGS_DIR']) && file_exists($_SERVER['D
 
 if (file_exists('/var/www/site-php')) {
     require('/var/www/site-php/iiedmulti/biocultural-settings.inc');
+}
+
+if (isset($conf['memcache_servers'])) {
+  $conf['cache_backends'][] = './sites/all/modules/memcache/memcache.inc';
+  $conf['cache_default_class'] = 'MemCacheDrupal';
+  $conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
 }
