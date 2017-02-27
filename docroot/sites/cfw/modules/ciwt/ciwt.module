@@ -1,0 +1,74 @@
+<?php
+/** 
+ *  CIWT functions 
+ *  cb 2016/08/30
+ */
+
+/**
+ * Implements hook_field_attach_view_alter().
+ *
+ * Show titles of empty fields.
+ */
+ 
+function ciwt_field_attach_view_alter(&$output, $context) {
+	
+  // We proceed only on nodes.
+
+  if ($context['entity_type'] != 'node' || $context['view_mode'] != 'print') {
+    return;
+  } 
+  $node = $context['entity'];
+  // Load all instances of the fields for the node.
+  $instances = _field_invoke_get_instances('node', $node->type, array('default' => TRUE, 'deleted' => FALSE));
+ 
+  foreach ($instances as $field_name => $instance) {
+    // Set content for fields they are empty.
+	if (empty($node->{$field_name})) {
+      $display = field_get_display($instance, 'print', $node);
+	
+      // Do not add field that is hidden in current display.
+      if ($display['type'] == 'hidden') {
+        continue;
+      } //set display type on inline entity forms to editable to get this display type
+      if ($display['type'] == 'editable') {
+        continue;
+      }
+      // Load field settings.
+      $field = field_info_field($field_name);
+	  $allowed_values = list_allowed_values($field);
+	 // now $allowed_values is an array of allowed values for your field
+	  $str_allows_values = '<div>No data';
+	  if ($allowed_values) {
+		    $str_allows_values .= ', possible values:';
+			foreach($allowed_values as $key => $allowed) {
+    		$str_allows_values .= '<li>' . $allowed. '</li>';   //build a string out of the array
+			}
+	 }
+	 
+      // Set output for field.
+      $output[$field_name] = array(
+        '#theme' => 'field',
+        '#title' => $instance['label'],
+        '#label_display' => 'above',
+        '#field_type' => $field['type'],
+        '#field_name' => $field_name,
+		'#bundle' => $node->type,
+        '#object' => $node,
+        '#items' => array(),
+        '#entity_type' => 'node',
+        '#weight' => $display['weight'],
+        0 => array('#markup' => '&nbsp;'),
+		'#suffix' => '<ul class="my-allowed-values">'.$str_allows_values.'</ul></div>',
+      );
+    }
+  }
+}
+
+/**
+ * Set contact form title
+ * Implements hook_form_FORM_ID_alter()
+ */
+function ciwt_form_contact_site_form_alter(&$form, &$form_state) {
+  drupal_set_title('Website feedback');
+}
+?>

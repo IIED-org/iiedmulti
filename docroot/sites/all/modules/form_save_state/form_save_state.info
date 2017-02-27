@@ -1,0 +1,16 @@
+name = Save Form State
+description = This Module periodically saves your form state to local storage when you are working.
+package = Other
+configure = admin/config/content/form_save_state
+
+dependencies[] = jquery_update
+dependencies[] = libraries (2.x)
+
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2014-01-08
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "form_save_state"
+datestamp = "1389146306"
+

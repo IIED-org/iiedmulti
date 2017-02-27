@@ -1,0 +1,22 @@
+/*
+ *   Important Information about this CSS File
+ *
+ * - Do not delete or rename this file, if you do not use it leave it blank (delete
+ *   everything) and the file will be skipped when you enable Production Mode in
+ *   the Global theme settings.
+ *
+ * - Read the _README file in this directory, it contains useful help and other information.
+ */
+#branding,
+#name-and-slogan {
+  background: #4c7a34 url("../images/rhino-gorilla.png") 10px center no-repeat;
+}
+
+#site-name {
+  line-height: 4em;
+  background: url("../images/elephant-tigress.png") right center no-repeat;
+}
+
+.logoright {
+  float: right;
+}
