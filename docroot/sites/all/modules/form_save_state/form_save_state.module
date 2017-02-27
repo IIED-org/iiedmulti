@@ -1,0 +1,325 @@
+<?php
+/**
+ * @file
+ * Save Form State
+ * This module periodically saves your form state to local storage.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function form_save_state_menu() {
+  $items = array(
+    'admin/config/content/form_save_state' => array(
+      'title' => 'Configure Save Form State',
+      'description' => 'Change options for Save Form State',
+      'type' => MENU_NORMAL_ITEM,
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('form_save_state_get_form_ids_form'),
+      'access arguments' => array('administer nodes'),
+    ),
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_form_alter().
+ */
+function form_save_state_form_alter(&$form, &$form_state, $form_id) {
+  $sisyphus_forms = variable_get('sisyphus_forms', array());
+  if (in_array($form_id, $sisyphus_forms)) {
+    $form_id = array_search($form_id, $sisyphus_forms);
+    $form_id = str_replace('_', '-', $form_id);
+
+    $settings = array(
+      'form_id' => $form_id,
+      'time' => variable_get('form_save_state_time', 15),
+      'notify' => variable_get('form_save_state_notify', 1),
+    );
+    drupal_add_js(array('form_save_state' => $settings), 'setting');
+
+    if ($settings['notify']) {
+      $notifications = form_save_state_translated_notifications();
+      drupal_add_js(array('form_save_state_notifications' => $notifications), 'setting');
+
+      drupal_add_js(drupal_get_path('module', 'form_save_state') . '/jquery.jnotify.min.js');
+      drupal_add_css(drupal_get_path('module', 'form_save_state') . '/jquery.jnotify.min.css');
+    }
+
+    // Include jStorage if necessary
+    if (variable_get('form_save_state_old_ie_support', 1)) {
+      libraries_load('jStorage', 'minified');
+    }
+    // Load the Sisyphus library
+    libraries_load('sisyphus', 'minified');
+  }
+}
+
+
+/**
+ * Configuration form
+ */
+function form_save_state_get_form_ids_form($form, &$form_state) {
+  $form_ids = array(
+    'contact_site_form' => 'contact_site_form',
+    'contact_personal_form' => 'contact_personal_form',
+  );
+
+  // Add form_ids of all currently known node types too.
+  foreach (node_type_get_types() as $type => $name) {
+    $form_ids[$type . '_node_form'] = $type . '_node_form';
+    $form_ids['comment_node_' . $type . '_form'] = 'comment_node_' . $type . '_form';
+  }
+
+  $for_textarea = array();
+  $checked = array();
+  $saved_forms = variable_get('sisyphus_forms', array());
+
+  foreach ($saved_forms as $key => $value) {
+    if (in_array($key, array_keys($form_ids))) {
+      $checked[$key] = $key;
+    }
+    else {
+      $for_textarea[$key] = $key;
+    }
+  }
+
+  $form['#form_ids'] = $form_ids;
+
+  $form['forms'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Forms'),
+    '#options' => $form_ids,
+    '#default_value' => $checked,
+    '#description' => t('Select the form IDs that you want to enable Motion CAPTCHA.'),
+  );
+
+  $form['additional_forms'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Other Forms:'),
+    '#default_value' => implode("\n", $for_textarea),
+    '#description' => t('Add the form IDs you want to include.'),
+    '#resizable' => FALSE,
+  );
+  $form['time'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Time (in Seconds)'),
+    '#default_value' => variable_get('form_save_state_time', 15),
+    '#size' => 60,
+    '#maxlength' => 128,
+    '#description' => t('The time interval between each form state save'),
+  );
+
+  $form['old_ie_support'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Support IE 6/7'),
+    '#default_value' => variable_get('form_save_state_old_ie_support', 1),
+    '#description' => t('Select if you want to support form data save and load in IE 6 and 7. This will include the jStorage library.'),
+  );
+
+  // add support for disabling notify messages
+  $form['notify'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Notify user of actions (saving and restoring form data)'),
+    '#default_value' => variable_get('form_save_state_notify', 1),
+    '#description' => t('Select if you want users to see saving and restoring data messages.'),
+  );
+
+  $form['notification_messages'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Notification Messages'),
+    '#description' => t('If using user notifications, the notification messages may be modified. '),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  if (module_exists('i18n_string')) {
+    $form['notification_messages']['#description'] .= t('These notifications may be translated in the !translation_interface under the Save Form State text group.', array('!translation_interface' => l(t('Translation Interface'), 'admin/config/regional/translate/translate')));
+  }
+  $form['notification_messages']['form_save_state_notification_saved'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Data saved to local storage'),
+    '#description' => t('Shown after form data is saved locally.'),
+    '#default_value' => variable_get('form_save_state_notification_saved', 'Data saved to local storage'),
+    '#size' => 40,
+    '#maxlength' => 255,
+  );
+  $form['notification_messages']['form_save_state_notification_restored'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Restored'),
+    '#description' => t('Shown after the form is loaded with locally-stored data.'),
+    '#default_value' => variable_get('form_save_state_notification_restored', 'Data restored from local storage to form'),
+    '#size' => 40,
+    '#maxlength' => 255,
+  );
+  $form['notification_messages']['form_save_state_notification_removed'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Removed'),
+    '#description' => t('Shown after locally-stored data is wiped out.'),
+    '#default_value' => variable_get('form_save_state_notification_removed', 'Data removed from local storage'),
+    '#size' => 40,
+    '#maxlength' => 255,
+  );
+
+  $form['save'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Configuration'),
+  );
+
+  return $form;
+}
+
+/**
+ * Save the configuration form
+ */
+function form_save_state_get_form_ids_form_submit($form, &$form_state) {
+  $sisyphus_forms = array();
+
+  $form_ids = $form['#form_ids'];
+
+  foreach ($form_state['values']['forms'] as $key => $value) {
+    if ($value) {
+      $sisyphus_forms[$key] = $form_ids[$key];
+    }
+  }
+
+  if ($form_state['values']['additional_forms'] != '') {
+    $addtional_forms = explode("\n", $form_state['values']['additional_forms']);
+    foreach ($addtional_forms as $additional_item) {
+      if ($additional_item != '') {
+        $sisyphus_forms[trim($additional_item)] = trim($additional_item);
+      }
+    }
+  }
+  variable_set('sisyphus_forms', $sisyphus_forms);
+  variable_set('form_save_state_time', $form_state['values']['time']);
+  variable_set('form_save_state_old_ie_support', $form_state['values']['old_ie_support']);
+
+  // add support for disabling notify messages
+  variable_set('form_save_state_notify', $form_state['values']['notify']);
+
+  variable_set('form_save_state_notification_saved', $form_state['values']['form_save_state_notification_saved']);
+  variable_set('form_save_state_notification_restored', $form_state['values']['form_save_state_notification_restored']);
+  variable_set('form_save_state_notification_removed', $form_state['values']['form_save_state_notification_removed']);
+
+  drupal_set_message(t('Saved configuration options.'));
+}
+
+
+/**
+ * Get the notification messages, translated into the current language
+ */
+function form_save_state_translated_notifications() {
+  // Assume no translation, just get the strings saved in the module configuration
+  $return = array(
+    'saved' => variable_get('form_save_state_notification_saved', 'Data saved to local storage'),
+    'restored' => variable_get('form_save_state_notification_restored', 'Data restored from local storage to form'),
+    'removed' => variable_get('form_save_state_notification_removed', 'Data removed from local storage'),
+  );
+
+  // If string translation is in use, get the translations
+  if (function_exists('i18n_string')) {
+    $return = array(
+      'saved' => i18n_string('form_save_state:notification:text:saved', $return['saved']),
+      'restored' => i18n_string('form_save_state:notification:text:restored', $return['restored']),
+      'removed' => i18n_string('form_save_state:notification:text:removed', $return['removed']),
+    );
+  }
+
+  return $return;
+}
+
+
+/**
+ * Implements hook_libraries_info().
+ */
+function form_save_state_libraries_info() {
+  $libraries = array();
+
+  $libraries['jStorage'] = array(
+    'name' => 'jStorage',
+    'vendor url' => 'http://www.jstorage.info/',
+    'download url' => 'https://github.com/compujohnny/jStorage/archive/master.zip',
+    // JS file to include
+    'files' => array(
+      'js' => array('jstorage.js'),
+    ),
+    // Minified variant
+    'variants' => array(
+      'minified' => array(
+        'files' => array(
+          'js' => array('jstorage.min.js'),
+        ),
+      ),
+    ),
+    'version arguments' => array(),
+    'version callback' => 'form_save_state_library_version',
+  );
+
+  $libraries['sisyphus'] = array(
+    'name' => 'Sisyphus',
+    'vendor url' => 'http://sisyphus-js.herokuapp.com',
+    'download url' => 'https://github.com/compujohnny/sisyphus/archive/master.zip',
+    // JS file to include
+    'files' => array(
+      'js' => array('sisyphus.js'),
+    ),
+    // Minified variant
+    'variants' => array(
+      'minified' => array(
+        'files' => array(
+          'js' => array('sisyphus.min.js'),
+        ),
+      ),
+    ),
+    // Include this module's JS on top of Sisyphus
+    'integration files' => array(
+      'form_save_state' => array(
+        'js' => array('form_save_state.js'),
+      ),
+    ),
+    'version arguments' => array(),
+    'version callback' => 'form_save_state_library_version',
+  );
+
+  return $libraries;
+}
+
+
+/**
+ * Callback for Library version. Just return 1, since the Library needs a
+ * version to load properly.
+ */
+function form_save_state_library_version($library, $options) {
+  return '1';
+}
+
+
+/**
+ * Implements hook_i18n_string_info().
+ * Notify i18n_string that strings can be translated
+ */
+function form_save_state_i18n_string_info() {
+  $groups['form_save_state'] = array(
+    'title' => t('Save Form State'),
+    'description' => t('Translatable notification strings.'),
+    'format' => FALSE, // This group doesn't have strings with format
+    'list' => TRUE, // This group can list all strings
+  );
+  return $groups;
+}
+
+
+/**
+ * Implements hook_i18n_string_list().
+ * Tell i18n_string what strings can be translated, for notification messages.
+ */
+function form_save_state_i18n_string_list($group) {
+  if ($group == 'form_save_state') {
+    $strings['form_save_state']['notification']['text']['saved'] = 'Data saved to local storage';
+    $strings['form_save_state']['notification']['text']['restored'] = 'Data restored from local storage to form';
+    $strings['form_save_state']['notification']['text']['removed'] = 'Data removed from local storage';
+    return $strings;
+  }
+}

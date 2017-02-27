@@ -1,0 +1,41 @@
+<?php
+/**
+ * @file
+ * Install and uninstall hooks
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function form_save_state_uninstall() {
+  // Delete the module variables when the module is uninstalled
+  variable_del('sisyphus_forms');
+  variable_del('form_save_state_time');
+  variable_del('form_save_state_old_ie_support');
+
+  variable_del('form_save_state_notify');
+  variable_del('form_save_state_notification_saved');
+  variable_del('form_save_state_notification_restored');
+  variable_del('form_save_state_notification_removed');
+}
+
+
+
+/**
+ * Correct the spelling of "sisphus_forms" variable
+ */
+function form_save_state_update_7001() {
+  $forms = variable_get('sisphus_forms', array());
+  variable_set('sisyphus_forms', $forms);
+  variable_del('sisphus_forms');
+}
+
+/**
+ * Ensure that the Libraries module is enabled on sites that were using this
+ * module before Libraries was added as a dependency.
+ */
+function form_save_state_update_7002() {
+  if (!module_exists('libraries')) {
+    module_enable(array('libraries'));
+  }
+}

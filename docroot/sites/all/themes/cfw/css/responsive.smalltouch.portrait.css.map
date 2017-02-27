@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAIA;;;;;;;;GAQG;AAEH,2DAA2D;;AAC3D,IAAK;EACH,SAAS,EAAE,IAAI;;;AAGjB;;;;;gFAKgF;;AAChF,sBAAuB;EACrB,qBAAqB;EAWrB,gBAAgB;;;AAVhB,yBAAG;EACD,aAAa,EAAE,GAAG;;;AAElB,2BAAE;EACA,UAAU,EAAE,IAAI;EAChB,MAAM,EAAE,cAAc;EACtB,OAAO,EAAE,QAAQ;;;AAKrB,mCAAa;EACX,UAAU,EAAE,IAAI;EAChB,aAAa,EAAE,cAAc;;;;AAIjC,SAAW;EACV,WAAW,EAAE,MAAM;EACnB,SAAS,EAAE,KAAK;;;AAChB,cAAK;EACJ,UAAU,EAAE,MAAM;;;AAClB,qBAAS;EACR,UAAU,EAAE,OAAO;EACnB,OAAO,EAAE,sBAAsB;;;;AAKlC,SAAU;EACT,UAAU,EAAE,gBAAgB",
+"sources": ["../sass/responsive.smalltouch.portrait.scss"],
+"names": [],
+"file": "responsive.smalltouch.portrait.css"
+}
