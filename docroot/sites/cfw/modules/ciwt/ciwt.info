@@ -1,0 +1,3 @@
+name = CIWT functions
+description = Display empty fields in forms, renames contact form
+core = 7.x

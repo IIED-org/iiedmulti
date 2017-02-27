@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAIA;;;;;;;;GAQG;;AAEH,UAAW;EACV,WAAW,EAAE,GAAG;;;;AAGjB,UAAW;EACV,KAAK,EAAE,KAAK",
+"sources": ["../sass/responsive.tablet.landscape.scss"],
+"names": [],
+"file": "responsive.tablet.landscape.css"
+}

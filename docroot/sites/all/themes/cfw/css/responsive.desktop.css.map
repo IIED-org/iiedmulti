@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAIA;;;;;;;;GAQG;;AAEH;gBACiB;EAChB,UAAU,EAAE,gEAAmE;;;;AAGhF,UAAW;EACV,WAAW,EAAE,GAAG;EACd,UAAU,EAAE,4DAA4D;;;;AAG3E,UAAW;EACV,KAAK,EAAE,KAAK",
+"sources": ["../sass/responsive.desktop.scss"],
+"names": [],
+"file": "responsive.desktop.css"
+}
