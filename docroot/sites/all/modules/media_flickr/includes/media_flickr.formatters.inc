@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * File formatters for Flickr images.
  */
 
 /**
@@ -12,9 +13,9 @@ function media_flickr_file_formatter_info() {
     'label' => t('Flickr Photoset'),
     'file types' => array('video'),
     'default settings' => array(
-      'width' => media_flickr_variable_get('width'),
-      'height' => media_flickr_variable_get('height'),
-      'autoplay' => media_flickr_variable_get('autoplay'),
+      'width' => variable_get('media_flickr_width', 560),
+      'height' => variable_get('media_flickr_height', 340),
+      'autoplay' => variable_get('media_flickr_autoplay', FALSE),
     ),
     'view callback' => 'media_flickr_file_formatter_video_view',
     'settings callback' => 'media_flickr_file_formatter_video_settings',
@@ -34,6 +35,10 @@ function media_flickr_file_formatter_info() {
 
 /**
  * Implements hook_file_formatter_FORMATTER_view().
+ *
+ * @param $file
+ * @param $display
+ * @param $langcode
  */
 function media_flickr_file_formatter_video_view($file, $display, $langcode) {
   $scheme = file_uri_scheme($file->uri);
@@ -52,6 +57,10 @@ function media_flickr_file_formatter_video_view($file, $display, $langcode) {
 
 /**
  * Implements hook_file_formatter_FORMATTER_settings().
+ *
+ * @param $form
+ * @param $form_state
+ * @param $settings
  */
 function media_flickr_file_formatter_video_settings($form, &$form_state, $settings) {
   $element = array();
@@ -75,6 +84,10 @@ function media_flickr_file_formatter_video_settings($form, &$form_state, $settin
 
 /**
  * Implements hook_file_formatter_FORMATTER_view().
+ *
+ * @param $file
+ * @param $display
+ * @param $langcode
  */
 function media_flickr_file_formatter_image_view($file, $display, $langcode) {
   $scheme = file_uri_scheme($file->uri);
@@ -112,6 +125,10 @@ function media_flickr_file_formatter_image_view($file, $display, $langcode) {
 
 /**
  * Implements hook_file_formatter_FORMATTER_settings().
+ *
+ * @param $form
+ * @param $form_state
+ * @param $settings
  */
 function media_flickr_file_formatter_image_settings($form, &$form_state, $settings) {
   $element = array();
@@ -146,7 +163,7 @@ function media_flickr_file_default_displays() {
     'media_original' => array(
       'width' => 640,
       'height' => 480,
-      'autoplay' => media_flickr_variable_get('autoplay'),
+      'autoplay' => variable_get('media_flickr_autoplay', FALSE),
     ),
   );
   foreach ($default_video_settings as $view_mode => $settings) {
@@ -165,7 +182,7 @@ function media_flickr_file_default_displays() {
   // WYSIWYG editor. The higher weight ensures that the video display is used
   // where possible.
   $default_image_styles = array(
-    'media_preview' => 'square_thumbnail',
+    'media_preview' => 'media_thumbnail',
     'media_large' => 'large',
     'media_original' => ''
   );
@@ -182,4 +199,3 @@ function media_flickr_file_default_displays() {
 
   return $default_displays;
 }
-
