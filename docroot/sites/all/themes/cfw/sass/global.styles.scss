@@ -2123,4 +2123,26 @@ tr.error {
 	}
 }
 	
+/* Cookie compliance buttons */
+
+#popup-text {
+  color: $page;
+  font-size: 15px;
+  font-weight: normal !important;
+  margin: .5em 0 0 !important;
+}
+
+#sliding-popup .popup-content #popup-buttons button {
+   @extend #popup-text;
+   background: #585858;
+   border: none;
+   border-radius: 0;
+   text-shadow: none;
+   box-shadow: none;
+   padding:5px 7px;
+   &:hover {
+     background: #dfdfdf;
+     color: #777777;
+   }
+}
 	
