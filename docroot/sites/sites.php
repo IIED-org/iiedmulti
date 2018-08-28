@@ -68,3 +68,8 @@ $sites['communitiesforwildlife.iied.org'] = 'cfw';
 $sites['cfw.ac.iied.org'] = 'cfw';
 $sites['cfw-dev.ac.iied.org'] = 'cfw';
 $sites['cfw-stage.ac.iied.org'] = 'cfw';
+
+$sites['sentinel.iied.org'] = 'sentinel';
+$sites['sentinel.ac.iied.org'] = 'sentinel';
+$sites['sentinel-dev.ac.iied.org'] = 'sentinel';
+$sites['sentinel.ac.iied.org'] = 'sentinel';
