@@ -1,0 +1,15 @@
+name = Classy Paragraphs
+description = Allows an editor to apply a class to paragraphs.
+package = Classy paragraphs
+dependencies[] = list
+dependencies[] = options
+dependencies[] = paragraphs
+core = 7.x
+
+files[] = tests/classy_paragraphs.test
+; Information added by Drupal.org packaging script on 2016-05-14
+version = "7.x-1.0"
+core = "7.x"
+project = "classy_paragraphs"
+datestamp = "1463189044"
+
