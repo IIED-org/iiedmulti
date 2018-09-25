@@ -1,0 +1,42 @@
+/* This file will hold styles that are loaded using the same media query as the narrow grid. */
+
+/* Panels pages CB added 20120421 */
+.panels-flexible-region, .panels-flexible-column {
+	clear:left;
+}
+
+.panels-flexible-column-3-2, .panels-flexible-column-3-1 {
+	width: 100%;
+}
+
+.page-our-work .page_title img, .page-about-us .page_title img {
+	display: none;
+}
+
+.page-our-work td.views-field-body, td.views-field-title {
+	width: 100%;
+}
+
+.page-our-work td.views-field-field-main-image {
+	width: 0;
+}
+
+/* NT added */
+
+#block-system-main .field-content img, .view-latest-nodes .field-content img, .pane-content .highlights img, .view-Highlights .field-content img {
+	
+	max-width: 220px;
+	max-height: 115px;
+	
+}
+
+.followicons {
+	margin-top: 0em;
+	float: none;
+    text-align: left;
+	
+}
+
+#footertext div.col1 p{
+    width: 160px;
+}

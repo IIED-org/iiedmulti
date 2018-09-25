@@ -1,0 +1,199 @@
+/* This file will hold styles that are loaded using the same media query as the narrow grid. */
+
+
+/**
+ * Based on the default jCarousel default skin. Adapted for use with the Mini
+ * Panels module by Wim Leers. GPL icons created by Kaj Heijmans.
+ */
+
+.jcarousel-skin-default .views-field-title {
+  text-align: left;
+  margin-right: 10px;	
+  max-width: 290px;  
+  line-height: 1.2em;
+  float:left;
+}
+
+.jcarousel-skin-default .views-field-field-tagline {
+    float: left;
+    margin-right: 10px;
+    margin-top: -185px;
+    max-width: 290px;
+	color: #58595B;
+	font-size: 15px; 
+}
+
+.jcarousel-skin-default .views-field-field-main-image .field-content {
+	margin-left: 300px;
+	padding-right: 20px;
+}
+
+.jcarousel-skin-default .jcarousel-container {
+  border-bottom: 1px solid #A7A8AB;
+  margin: auto;
+  text-align:left;
+  background-color: #D3CDC2;
+}
+
+.jcarousel-skin-default .jcarousel-container-horizontal {
+  width: auto;
+  height: 280px;
+  padding: 10px;
+}
+
+
+.jcarousel-skin-default .jcarousel-navigation-before {
+  padding-top: 30px;
+}
+
+.jcarousel-skin-default .jcarousel-navigation-after {
+  padding-bottom: 30px;
+}
+
+.jcarousel-skin-default .jcarousel-clip-horizontal {
+  width: 100%;
+  overflow: hidden;
+}
+
+.jcarousel-skin-default .jcarousel-item {
+  background: #D3CDC2;
+  padding: 0;
+  height: 280px;
+  overflow: hidden;
+  list-style: none;
+  width: 740px
+}
+
+.jcarousel-skin-default .jcarousel-item-horizontal {
+  margin: 0 4px;
+}
+
+.jcarousel-skin-default .jcarousel-item-placeholder {
+  background: #fff url(../jcarousel/throbber.gif) no-repeat center center;
+  color: #000;
+}
+
+/**
+ * Arrows
+ */
+.jcarousel-skin-default .jcarousel-next,
+.jcarousel-skin-default .jcarousel-prev {
+  display: block;
+  width: 35px;
+  height: 45px;
+  background-image: url(../jcarousel/arrows.png);
+}
+
+/**
+ *  Horizontal Buttons
+ */
+.jcarousel-skin-default .jcarousel-prev-horizontal, .jcarousel-skin-default .jcarousel-next-horizontal {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-position: 0 0;
+  top:auto;
+}
+.jcarousel-skin-default .jcarousel-prev-horizontal:hover, .jcarousel-skin-default .jcarousel-prev-horizontal:active {
+  background-position: 0px 45px;
+}
+
+.jcarousel-skin-default .jcarousel-next-horizontal {
+  left: auto;
+  right: 10px;
+  background-position: 35px 0px;
+}
+
+.jcarousel-skin-default .jcarousel-next-horizontal:hover, .jcarousel-skin-default .jcarousel-next-horizontal:active {
+  background-position: 35px 45px;
+}
+
+.jcarousel-skin-default .jcarousel-prev-disabled, .jcarousel-skin-default .jcarousel-next-disabled {
+	background-position: -9999px -9999px;
+	display:none;
+}
+
+/*#widget_pager_bottom_carousel-block_1 .views-content-counter {
+  background-color: #9FC4DC;
+  float: left;
+  height: 6px;
+  width: 40px;
+  margin-right: 5px;
+  text-indent: -9999px;
+  cursor: pointer;
+}
+
+#widget_pager_bottom_carousel-block_1 .active .views-content-counter {
+  background-color: #2874A2;
+}
+*/
+
+
+.jcarousel-skin-default .jcarousel-next-disabled-horizontal,
+.jcarousel-skin-default .jcarousel-next-disabled-horizontal:hover,
+.jcarousel-skin-default .jcarousel-next-disabled-horizontal:active {
+  cursor: default;
+  background-position: -96px -32px;
+}
+
+
+.jcarousel-skin-default ul.jcarousel-navigation {
+  margin-left: 40px;
+}
+
+.jcarousel-skin-default .jcarousel-navigation li {
+  display: inline;
+  margin: 0 5px 0 0;
+  padding: 0;
+  background-color: #FDFDFE;
+}
+
+.jcarousel-skin-default .jcarousel-navigation li a {
+  padding: 0px 15px;
+ line-height: 6px;
+  cursor: hand;
+}
+
+.jcarousel-fade {
+    background: url(../jcarousel/fade.png) no-repeat scroll right top transparent;
+    height: 300px;
+	margin: 35px 43px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 175px;
+    z-index: 1;
+}
+
+
+/* nt added */
+
+
+/* margin on 2nd carousel - remove */ #block-views-carousel-block { margin-top: 50px; }
+
+
+/***** Styling to go in color.css and global once agreed ****/
+
+/* news and blogs */
+
+
+
+/* highlights */
+
+.view-front-feature h3.field-content {
+	
+	font-size:20px; 
+}
+
+.view-front-feature .view-front-feature .views-row {
+	padding-bottom: 15px;
+}
+
+/* get involved */
+/* publications */
+
+
+/* Panels pages CB added 20120421 */
+.panels-flexible-region, .panels-flexible-column {
+	clear:none;
+}

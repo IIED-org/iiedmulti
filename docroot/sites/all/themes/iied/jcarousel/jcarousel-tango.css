@@ -1,0 +1,191 @@
+
+/**
+ * Based on the default jCarousel tango skin. Adapted for use with the Mini
+ * Panels module by Wim Leers. GPL icons created by Kaj Heijmans.
+ */
+
+.jcarousel-skin-tango .field-content.ctitle {
+  text-align: left;
+  margin-top: 0px;
+  font-size:24px;
+  float: left;
+  font-family: Georgia,'Times New Roman',serif;
+  margin-right: 10px;	
+  max-width: 275px;  
+}
+
+
+.jcarousel-skin-tango .carousel_text {
+    float: left;
+    margin-right: 10px;
+    margin-top: -150px;
+    max-width: 275px;
+	color: #58595B;
+	font-size: 15px; 
+}
+
+.jcarousel-skin-tango .jcarousel-container {
+  background: #D3CDC2;
+  border-top: 6px solid #00B2DD;
+  border-bottom: 1px solid #A7A8AB;
+  margin: auto;
+}
+
+.jcarousel-skin-tango .jcarousel-container-horizontal {
+  max-width: 95%;
+  height: 280px;
+  padding: 15px 43px;
+}
+
+
+.jcarousel-skin-tango .jcarousel-navigation-before {
+  padding-top: 30px;
+}
+
+.jcarousel-skin-tango .jcarousel-navigation-after {
+  padding-bottom: 30px;
+}
+
+.jcarousel-skin-tango .jcarousel-clip-horizontal {
+  width: 100%;
+  overflow: hidden;
+}
+
+
+.jcarousel-skin-tango .jcarousel-item {
+  padding: 0;
+  width: 740px;
+  height: 280px;
+  overflow: hidden;
+  border: 1px solid #CCC;
+  list-style: none;
+}
+
+.jcarousel-skin-tango .jcarousel-item-horizontal {
+  margin: 0 4px;
+}
+
+
+.jcarousel-skin-tango .jcarousel-item-placeholder {
+  background: #fff url(throbber.gif) no-repeat center center;
+  color: #000;
+}
+
+/**
+ * Buttons
+ */
+.jcarousel-skin-tango .jcarousel-next,
+.jcarousel-skin-tango .jcarousel-prev {
+  display: block;
+  width: 35px;
+  height: 45px;
+  background-image: url(arrows.png);
+}
+
+/**
+ *  Horizontal Buttons
+ */
+.jcarousel-skin-tango .jcarousel-prev-horizontal {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-position: 0 0;
+}
+.jcarousel-skin-tango .jcarousel-prev-horizontal:hover {
+  background-position: 0px 45px;
+}
+.jcarousel-skin-tango .jcarousel-prev-horizontal:active {
+  background-position: 0px 45px;
+}
+
+.jcarousel-skin-tango .jcarousel-next-horizontal {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-position: 35px 0px;
+}
+.jcarousel-skin-tango .jcarousel-next-horizontal:hover {
+  background-position: 35px 45px;
+}
+.jcarousel-skin-tango .jcarousel-next-horizontal:active {
+  background-position: 35px 45px;
+}
+
+/*#widget_pager_bottom_carousel-block_1 .views-content-counter {
+  background-color: #9FC4DC;
+  float: left;
+  height: 6px;
+  width: 40px;
+  margin-right: 5px;
+  text-indent: -9999px;
+  cursor: pointer;
+}
+
+#widget_pager_bottom_carousel-block_1 .active .views-content-counter {
+  background-color: #2874A2;
+}
+*/
+
+
+
+.jcarousel-skin-tango .jcarousel-next-disabled-horizontal,
+.jcarousel-skin-tango .jcarousel-next-disabled-horizontal:hover,
+.jcarousel-skin-tango .jcarousel-next-disabled-horizontal:active {
+  cursor: default;
+  background-position: -96px -32px;
+}
+
+
+.jcarousel-skin-tango .jcarousel-navigation {
+  margin: 0 0 0 40px;
+  padding: 4px;
+}
+
+.jcarousel-skin-tango .jcarousel-navigation li {
+  display: inline;
+  margin: 0 5px 0 0;
+  padding: 0;
+  background-color: #FDFDFE;
+  height: 6px;
+  width: 40px;
+
+}
+
+.jcarousel-skin-tango .jcarousel-navigation li span {
+  height: 6px;
+  width: 40px;
+}
+
+.jcarousel-skin-tango .jcarousel-navigation li a {
+  padding: 0px 20px;
+  text-indent: -9999px;
+  cursor: pointer;
+}
+
+
+.jcarousel-skin-tango .jcarousel-navigation li a:hover {
+  background-color: #2874A2;
+}
+
+.jcarousel-skin-tango .jcarousel-navigation li.active a {
+  background-color: #2874A2;
+}
+
+.jcarousel-skin-tango .cimage {
+	margin-left: 275px; 
+	border-right: 1px solid white;
+    padding-right: 20px;
+}
+
+
+.jcarousel-fade {
+    background: url(fade.png) no-repeat scroll right top transparent;
+    height: 300px;
+	margin: 35px 43px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 175px;
+    z-index: 1;
+}
+

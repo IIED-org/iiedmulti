@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the EandU features feature.
+ */
+
+include_once 'eandu_features.features.inc';
