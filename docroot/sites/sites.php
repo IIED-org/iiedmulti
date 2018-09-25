@@ -54,10 +54,10 @@
  * @see http://drupal.org/documentation/install/multi-site
  */
 
+$sites['biocultural.iied.org'] = 'biocultural';
 $sites['bch-dev.ac.iied.org'] = 'biocultural';
 $sites['bch-stage.ac.iied.org'] = 'biocultural';
 $sites['bch.ac.iied.org'] = 'biocultural';
-$sites['biocultural.iied.org'] = 'biocultural';
 
 $sites['shapingsustainablemarkets.iied.org'] = 'ssm';
 $sites['ssm.ac.iied.org'] = 'ssm';
@@ -68,3 +68,8 @@ $sites['communitiesforwildlife.iied.org'] = 'cfw';
 $sites['cfw.ac.iied.org'] = 'cfw';
 $sites['cfw-dev.ac.iied.org'] = 'cfw';
 $sites['cfw-stage.ac.iied.org'] = 'cfw';
+
+$sites['urbandensity.org'] = 'urbden';
+$sites['urbden.ac.iied.org'] = 'urbden';
+$sites['urbden-dev.ac.iied.org'] = 'urbden';
+$sites['urbden-stage.ac.iied.org'] = 'urbden';
