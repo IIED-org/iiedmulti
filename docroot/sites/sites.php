@@ -69,7 +69,14 @@ $sites['cfw.ac.iied.org'] = 'cfw';
 $sites['cfw-dev.ac.iied.org'] = 'cfw';
 $sites['cfw-stage.ac.iied.org'] = 'cfw';
 
+<<<<<<< HEAD
 $sites['urbandensity.org'] = 'urbden';
 $sites['urbden.ac.iied.org'] = 'urbden';
 $sites['urbden-dev.ac.iied.org'] = 'urbden';
 $sites['urbden-stage.ac.iied.org'] = 'urbden';
+=======
+$sites['sentinel.iied.org'] = 'sentinel';
+$sites['sentinel.ac.iied.org'] = 'sentinel';
+$sites['sentinel-dev.ac.iied.org'] = 'sentinel';
+$sites['sentinel-stage.ac.iied.org'] = 'sentinel';
+>>>>>>> 853c4edea94daa5b95431cb0b7f6ba531298b7c8
