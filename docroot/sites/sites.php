@@ -64,11 +64,6 @@ $sites['ssm.ac.iied.org'] = 'ssm';
 $sites['ssm-dev.ac.iied.org'] = 'ssm';
 $sites['ssm-stage.ac.iied.org'] = 'ssm';
 
-$sites['communitiesforwildlife.iied.org'] = 'cfw';
-$sites['cfw.ac.iied.org'] = 'cfw';
-$sites['cfw-dev.ac.iied.org'] = 'cfw';
-$sites['cfw-stage.ac.iied.org'] = 'cfw';
-
 $sites['urbandensity.org'] = 'urbden';
 $sites['urbden.ac.iied.org'] = 'urbden';
 $sites['urbden-dev.ac.iied.org'] = 'urbden';
