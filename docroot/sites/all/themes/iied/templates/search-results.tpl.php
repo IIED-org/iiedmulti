@@ -32,7 +32,7 @@
   <?php print search_help('search#noresults', drupal_help_arg()); ?>
 <?php endif; ?>
 <?php if (arg(2)):?>
-  	<div class="search-footer"><h3>If you are unable to find what you are looking for, please also <a href="http://pubs.iied.org/search.php?k=<?php print(arg(2)); ?>">search our publications database for &quot;<?php print(urldecode(arg(2))); ?>&quot;</a>.</h3></div>
+  	<div class="search-footer"><h3>If you are unable to find what you are looking for, please also <a href="http://pubs.iied.org/search.php?k=<?php print(filter_xss(arg(2))); ?>">search our publications database for &quot;<?php print(filter_xss(urldecode(arg(2)))); ?>&quot;</a>.</h3></div>
 <?php else : ?>
    	<div class="search-footer"><h3>If you are unable to find what you are looking for, please also search our <a href="http://pubs.iied.org">publications database</a>.</h3></div>
 <?php endif; ?>
