@@ -4,3 +4,5 @@ docroot/sites/*/files
 docroot/sites/*/private
 settings.local.php
 
+# Ignore Mac files
+.DS_Store
