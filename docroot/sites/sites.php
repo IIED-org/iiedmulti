@@ -58,18 +58,16 @@ $sites['biocultural.iied.org'] = 'biocultural';
 $sites['bch-dev.ac.iied.org'] = 'biocultural';
 $sites['bch-stage.ac.iied.org'] = 'biocultural';
 $sites['bch.ac.iied.org'] = 'biocultural';
+$sites['biocultural.lndo.site'] = 'biocultural';
 
 $sites['shapingsustainablemarkets.iied.org'] = 'ssm';
 $sites['ssm.ac.iied.org'] = 'ssm';
 $sites['ssm-dev.ac.iied.org'] = 'ssm';
 $sites['ssm-stage.ac.iied.org'] = 'ssm';
+$sites['ssm.lndo.site'] = 'ssm';
 
 $sites['urbandensity.org'] = 'urbden';
 $sites['urbden.ac.iied.org'] = 'urbden';
 $sites['urbden-dev.ac.iied.org'] = 'urbden';
 $sites['urbden-stage.ac.iied.org'] = 'urbden';
-
-$sites['sentinel.iied.org'] = 'sentinel';
-$sites['sentinel.ac.iied.org'] = 'sentinel';
-$sites['sentinel-dev.ac.iied.org'] = 'sentinel';
-$sites['sentinel-stage.ac.iied.org'] = 'sentinel';
+$sites['urbden.lndo.site'] = 'urbden';

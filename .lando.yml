@@ -1,0 +1,28 @@
+name: iiedmulti
+recipe: acquia
+config:
+  acli_version: latest
+  ah_application_uuid: 2201d573-ca9b-4833-8966-bb7531b99019
+  ah_site_group: iiedmulti
+  php: '7.4'
+  conf:
+    php: lando/php/php.ini
+    appserver:
+proxy:
+  appserver:
+    - biocultural.lndo.site
+    - urbden.lndo.site
+    - ssm.lndo.site
+services:
+  biocultural_db:
+    type: mysql:5.7
+    config:
+      confd: lando/mysql/conf.d
+  urbden_db:
+    type: mysql:5.7
+    config:
+      confd: lando/mysql/conf.d
+  ssm_db:
+    type: mysql:5.7
+    config:
+      confd: lando/mysql/conf.d

@@ -637,7 +637,7 @@ if (isset($_SERVER['DEVDESKTOP_DRUPAL_SETTINGS_DIR']) && file_exists($_SERVER['D
 }
 // </DDSETTINGS>
 
-if (file_exists('/var/www/site-php')) {
+if (file_exists('/var/www/site-php/iiedmulti/urbden-settings.inc')) {
     require('/var/www/site-php/iiedmulti/urbden-settings.inc');
 }
 
@@ -645,4 +645,8 @@ if (isset($conf['memcache_servers'])) {
   $conf['cache_backends'][] = './sites/all/modules/memcache/memcache.inc';
   $conf['cache_default_class'] = 'MemCacheDrupal';
   $conf['cache_class_cache_form'] = 'DrupalDatabaseCache';
+}
+
+if (file_exists(DRUPAL_ROOT . '/' . conf_path() . '/settings.local.php')) {
+  include DRUPAL_ROOT . '/' . conf_path() . '/settings.local.php';  
 }
