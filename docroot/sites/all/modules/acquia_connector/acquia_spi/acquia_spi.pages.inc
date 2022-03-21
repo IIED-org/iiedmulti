@@ -2,7 +2,7 @@
 
 /**
  * @file
- *   Site environment change detected form.
+ * Site environment change detected form.
  */
 
 /**
@@ -17,7 +17,7 @@ function acquia_spi_environment_change_form($form, &$form_state) {
   $off_acquia_hosting = array_key_exists('acquia_hosted', $env_changes) && !acquia_spi_check_acquia_hosted();
 
   if (!acquia_spi_environment_change_detected() && !$blocked) {
-    $form['#prefix'] = t('<h2>No changes detected</h2><p>This form is used to address changes in your site\'s environment. No changes are currently detected.</p>');
+    $form['#prefix'] = t("<h2>No changes detected</h2><p>This form is used to address changes in your site's environment. No changes are currently detected.</p>");
     return $form;
   }
   elseif ($blocked) {

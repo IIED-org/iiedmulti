@@ -770,12 +770,14 @@ function flickr_admin_settings_submit($form, &$form_state) {
       }
     }
   }
-  // Reset to the default preview template if it is found empty.
-  $trimmed = trim($form_state['values']['flickr_preview_html']['value']);
-  $form_state['values']['flickr_preview_html'] = empty($trimmed) ? variable_set('flickr_preview_html', array(
-    'value' => '[flickr-user:id=lolandese1, size=q, num=2, sort=views]',
-    'format' => 'full_html',
-  )) : $form_state['values']['flickr_preview_html'];
+  if (module_exists('flickr_filter')) {
+    // Reset to the default preview template if it is found empty.
+    $trimmed = trim($form_state['values']['flickr_preview_html']['value']);
+    $form_state['values']['flickr_preview_html'] = empty($trimmed) ? variable_set('flickr_preview_html', array(
+      'value' => '[flickr-user:id=lolandese1, size=q, num=2, sort=views]',
+      'format' => 'full_html',
+    )) : $form_state['values']['flickr_preview_html'];
+  }
   // Optionally make changes visible after form submit.
   if ($form_state['values']['flickr_cc']) {
     drupal_flush_all_caches();

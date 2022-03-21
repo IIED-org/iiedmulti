@@ -11,8 +11,9 @@ These modules allow you to connect any Drupal 7.x site to Acquia Insight.
 Acquia also has a distribution of Drupal called Acquia Drupal which is
 composed of purely open source GPL licensed components. If you are looking
 for a quick start with Drupal, Acquia Drupal [2] might be of great use for you.
-(Note that a few Acquia Subscription services, such as the update notification and
-code modification detection services, currently only work with Acquia Drupal.)
+(Note that a few Acquia Subscription services, such as the update notification
+and code modification detection services, currently only work with Acquia
+Drupal.)
 
 [1] http://acquia.com/products-services/acquia-network
 [2] http://acquia.com/products-services/acquia-drupal
@@ -34,8 +35,9 @@ hosted search service. Requires Apache Solr Search Integration module.
 Installation
 --------------------------------------------------------------------------------
 
-Consult the online documentation at https://docs.acquia.com/acquia-cloud/insight/install/ for
-installation instructions.
+Consult the online documentation at
+https://docs.acquia.com/acquia-cloud/insight/install/ for installation
+instructions.
 
 Notes on Acquia Search data protection and index auto-switching
 --------------------------------------------------------------------------------
@@ -79,5 +81,5 @@ Issues
 Contact Acquia Support if you have support questions regarding your site.
 
 If you have issues with the submodules included in the Acquia Connector package,
-you are also welcome to submit issues at http://drupal.org/project/acquia_connector
-(all submitted issues are public).
+you are also welcome to submit issues at
+http://drupal.org/project/acquia_connector (all submitted issues are public).

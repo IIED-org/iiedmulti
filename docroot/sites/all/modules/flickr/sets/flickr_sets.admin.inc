@@ -48,7 +48,7 @@ function flickr_sets_form_flickr_admin_settings_alter(&$form, &$form_state) {
     '#title' => t('Number of photos per set'),
     '#required' => TRUE,
     '#default_value' => variable_get('flickr_sets_photos_per_set', 6),
-    '#description' => t('How many photos display in a set on user profile pages at <em>flickr/%uid/sets/%nsid</em>. Clear the cache on form submit.'),
+    '#description' => t("How many photos display in a set on user profile pages at <em>flickr/%uid/sets/%nsid</em> or in a Flickr photo field with '<em>Item Type: Photoset</em>'. Clear the cache on form submit."),
     '#size' => 2,
     '#maxlength' => 2,
   );

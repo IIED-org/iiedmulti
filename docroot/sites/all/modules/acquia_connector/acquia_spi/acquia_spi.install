@@ -2,13 +2,13 @@
 
 /**
  * @file
- *   Installer file for Acquia SPI module.
+ * Installer file for Acquia SPI module.
  */
 
 // -- Core hooks ---------------------------------------------------------------
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function acquia_spi_uninstall() {
   variable_del('acquia_spi_cron_last');
@@ -83,7 +83,8 @@ function acquia_spi_requirements($phase) {
           $config_url  = url('admin/config/system/acquia-agent');
           $description = t('You are not currently sending site profile data to Acquia Insight. You can <a href="!config-page">connect this site to Acquia Insight</a>.', array('!config-page' => $config_url));
         }
-        elseif ($ago >= 60 * 60 * 36) { // 1.5 days ago.
+        // 1.5 days ago.
+        elseif ($ago >= 60 * 60 * 36) {
           $severity    = REQUIREMENT_WARNING;
           $description = t('SPI data has not been reported to the Acquia Subscription for more than a day.<br/>');
         }
@@ -104,9 +105,9 @@ function acquia_spi_requirements($phase) {
           }
           $description .= t('You can <a href="!spi-send">manually send SPI data</a>.', array(
             '!spi-send' => url('system/acquia-spi-send', array(
-                'query' => array('destination' => 'admin/reports/status', 'key' => $key)
-              )
+              'query' => array('destination' => 'admin/reports/status', 'key' => $key),
             )
+            ),
           ));
         }
         if ($last_sent == 0) {
@@ -126,7 +127,7 @@ function acquia_spi_requirements($phase) {
       // Acquia SPI custom tests status.
       $variables = array(
         '@help'     => url('admin/help/acquia_agent'),
-        '@validate' => url('system/acquia-spi-custom-test-validate')
+        '@validate' => url('system/acquia-spi-custom-test-validate'),
       );
 
       $modules = module_implements('acquia_spi_test');
@@ -139,7 +140,7 @@ function acquia_spi_requirements($phase) {
         $result = acquia_spi_test_status();
 
         if (!empty($result)) {
-          $modules = implode(', ', array_keys($result));
+          $modules     = implode(', ', array_keys($result));
           $description = 'Custom tests within the following module(s) have failed validation and will not be sent: %modules. <br/>Please check the error logs for more information regarding how to pass validation or <a href="@validate">perform another validation check</a>. (A validation check can also be performed via the Drush command, "spi-test-validate.")';
           $value       = 'Failed (<a href="@help">more information</a>)';
           $severity    = REQUIREMENT_ERROR;
@@ -155,7 +156,9 @@ function acquia_spi_requirements($phase) {
       }
       $requirements['acquia_spi_test'] = array(
         'title'       => t('Acquia Insight Custom Tests'),
+        // phpcs:ignore
         'description' => t($description, $variables),
+        // phpcs:ignore
         'value'       => t($value, $variables),
         'severity'    => $severity,
       );
@@ -185,6 +188,5 @@ function acquia_spi_update_7002() {
  * Delete the module diff data variable.
  */
 function acquia_spi_update_7003() {
-    variable_del('acquia_spi_module_diff_data');
+  variable_del('acquia_spi_module_diff_data');
 }
-

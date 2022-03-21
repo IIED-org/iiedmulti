@@ -1,0 +1,13 @@
+name = Feeds: Flickr parser
+description = Adds a JSON Flickr feed processor to the Feeds module
+dependencies[] = feeds
+dependencies[] = date
+package = Flickr
+version = VERSION
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2020-03-07
+version = "7.x-1.9"
+core = "7.x"
+project = "flickr"
+datestamp = "1583608631"

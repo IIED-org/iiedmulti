@@ -124,7 +124,7 @@ function flickrfield_form_process_flickrfield($element, $form_state, $form = arr
     '#default_value' => !empty($element['#value']['nsid']) ? $element['#value']['nsid'] : variable_get('flickr_default_userid', ''),
     '#required' => $element['#required'],
     '#description' => t("The user id of the Flickr user who owns the photos. If this is left blank, the sites's default user will be used. Current default id is @id. !find_id", array(
-      '@id' => variable_get('flickr_default_userid', ''),
+      '@id' => !empty(variable_get('flickr_default_userid', '')) ? variable_get('flickr_default_userid', '') : t('not set'),
       '!find_id' => $idgettr,
     )),
   );
@@ -221,13 +221,20 @@ function flickrfield_field_formatter_view($entity_type, $entity, $field, $instan
   $element = array();
   $sizes = array_keys(flickr_photo_sizes());
   foreach ($items as $delta => $item) {
-    $variables = array(
-      '#node' => $entity,
-      '#item' => $item,
-      '#formatter' => $display['type'],
-      '#field_name' => $field['field_name'],
-    );
-    $element[$delta]['#markup'] = theme('flickrfield_formatter_' . $display['type'], $variables);
+    // Use the first element (set or photo ID) of each item as a cache key.
+    if ($cache = cache_get('flickrfield_' . key($item) . '_' . reset($item), 'cache')) {
+      $element[$delta]['#markup'] = $cache->data;
+    }
+    else {
+      $variables = array(
+        '#node' => $entity,
+        '#item' => $item,
+        '#formatter' => $display['type'],
+        '#field_name' => $field['field_name'],
+      );
+      $element[$delta]['#markup'] = theme('flickrfield_formatter_' . $display['type'], $variables);
+      cache_set('flickrfield_' . key($item) . '_' . reset($item), $element[$delta]['#markup'], 'cache', time() + (variable_get('flickrfield_refresh', 24) * 60 * 60));
+    }
   }
   return $element;
 }

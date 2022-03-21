@@ -18,7 +18,7 @@ class PreferredSearchCoreService {
    *   E.g. 'default'.
    * @param string $ah_db_name
    *   E.g. 'my_site_db'.
-   * @param array $available_cores
+   * @param mixed $available_cores
    *   E.g.
    *     [
    *       [
@@ -144,7 +144,6 @@ class PreferredSearchCoreService {
       $possible_core_ids[] = $this->acquia_identifier . '.' . $ah_env . '.' . $sites_foldername;
 
       // @TODO: Support for [id]_[env][sitename] cores?
-
     }
 
     // For production-only, we allow auto-connecting to the suffix-less core

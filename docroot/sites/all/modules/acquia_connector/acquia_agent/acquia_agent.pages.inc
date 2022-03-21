@@ -2,11 +2,11 @@
 
 /**
  * @file
- *   Acquia Agent configuration page.
+ * Acquia Agent configuration page.
  */
 
 /**
- * Hash a password according to Drupal's password_crypt and settings from remote.
+ * Hash password according to Drupal's password_crypt and settings from remote.
  */
 function _acquia_agent_hash_password_crypt($algorithm, $pass, $setting, $extra_md5 = FALSE) {
   // Server may state that password needs to be hashed with MD5 first.
@@ -25,13 +25,13 @@ function _acquia_agent_hash_password_crypt($algorithm, $pass, $setting, $extra_m
 }
 
 /**
- *  Main free subscription form function
+ * Main free subscription form function.
  */
 function acquia_agent_an_start_form($form, &$form_state, $banner) {
   $header = acquia_agent_an_info_header();
 
   $form = array(
-    '#prefix' =>  '<div class="an-start-form">',
+    '#prefix' => '<div class="an-start-form">',
     'header'  => array('#markup' => $header),
     'banner'  => array('#markup' => $banner),
     '#theme'  => 'acquia_agent_banner_form',
@@ -41,7 +41,7 @@ function acquia_agent_an_start_form($form, &$form_state, $banner) {
 }
 
 /**
- * Main page function
+ * Main page function.
  */
 function acquia_agent_settings_page($arg = NULL) {
   $banner = '';
@@ -73,8 +73,8 @@ function acquia_agent_settings_page($arg = NULL) {
   else {
     if (empty($subscription)) {
       // Subscription name isn't set but key and id are is likely because
-      // user has updated from Acquia Connector 2.1. Need to clear menu cache and
-      // set subscription name.
+      // user has updated from Acquia Connector 2.1. Need to clear menu cache
+      // and set subscription name.
       _acquia_agent_setup_subscription_name();
     }
     return drupal_get_form('acquia_agent_settings_form', $banner);
@@ -93,6 +93,9 @@ function acquia_agent_automatic_setup_form($form, &$form_state) {
   }
 }
 
+/**
+ * Needs comment.
+ */
 function _acquia_agent_automatic_setup_form_start(&$form_state) {
   $form = array(
     '#prefix' => t('Log in or <a href="!url">configure manually</a> to connect your site to Acquia.', array('!url' => url('admin/config/system/acquia-agent/credentials'))),
@@ -122,6 +125,9 @@ function _acquia_agent_automatic_setup_form_start(&$form_state) {
   return $form;
 }
 
+/**
+ * Needs comment.
+ */
 function _acquia_agent_automatic_setup_form_choose(&$form_state) {
   $options = array();
   foreach ($form_state['subscriptions'] as $credentials) {
@@ -129,7 +135,7 @@ function _acquia_agent_automatic_setup_form_choose(&$form_state) {
   }
   asort($options);
   $form = array(
-    '#prefix' =>  t('You have multiple subscriptions available.'),
+    '#prefix' => t('You have multiple subscriptions available.'),
     'subscription' => array(
       '#type' => 'select',
       '#title' => t('Available subscriptions'),
@@ -145,6 +151,9 @@ function _acquia_agent_automatic_setup_form_choose(&$form_state) {
   return $form;
 }
 
+/**
+ * Needs comment.
+ */
 function acquia_agent_automatic_setup_form_validate($form, &$form_state) {
   if (!isset($form_state['choose'])) {
     // Validate e-mail address and get account hash settings.
@@ -153,7 +162,8 @@ function acquia_agent_automatic_setup_form_validate($form, &$form_state) {
     );
     $authenticator = _acquia_agent_create_authenticator($body);
     $data = array('body' => $body, 'authenticator' => $authenticator);
-    // Does not use acquia_agent_call() because Network identifier and key are not available.
+    // Does not use acquia_agent_call() because Network identifier and key are
+    // not available.
     $server = variable_get('acquia_network_address', 'https://rpc.acquia.com');
     $result = _acquia_agent_request(acquia_agent_network_address($server), 'acquia.agent.communication.settings', $data);
 
@@ -175,6 +185,9 @@ function acquia_agent_automatic_setup_form_validate($form, &$form_state) {
   }
 }
 
+/**
+ * Needs comment.
+ */
 function acquia_agent_automatic_setup_form_submit($form, &$form_state) {
   if (isset($form_state['choose']) && isset($form_state['subscriptions'][$form_state['values']['subscription']])) {
     $sub = $form_state['subscriptions'][$form_state['values']['subscription']];
@@ -199,6 +212,9 @@ function acquia_agent_automatic_setup_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Needs comment.
+ */
 function _acquia_agent_automatic_start_submit(&$form_state) {
   // Make hashed password signed request to Acquia for subscriptions.
   $body = array(
@@ -209,7 +225,8 @@ function _acquia_agent_automatic_start_submit(&$form_state) {
   // _acquia_agent_setup_form_validate().
   $authenticator = _acquia_agent_create_authenticator($body, $form_state['pass']);
   $data = array('body' => $body, 'authenticator' => $authenticator);
-  // Does not use acquia_agent_call() because Network identifier and key are not available.
+  // Does not use acquia_agent_call() because Network identifier and key are not
+  // available.
   $server = variable_get('acquia_network_address', 'https://rpc.acquia.com');
 
   $result = _acquia_agent_request(acquia_agent_network_address($server), 'acquia.agent.subscription.credentials', $data);
@@ -220,7 +237,7 @@ function _acquia_agent_automatic_start_submit(&$form_state) {
     form_set_error('');
   }
   elseif (!$result) {
-    // Email doesn't exist
+    // Email doesn't exist.
     form_set_error('email', t('Server error, please submit again.'));
   }
   elseif (!empty($result['is_error'])) {
@@ -233,7 +250,8 @@ function _acquia_agent_automatic_start_submit(&$form_state) {
     // Multistep form for choosing from available subscriptions.
     $form_state['choose'] = TRUE;
     $form_state['subscriptions'] = $result['body']['subscription'];
-    $form_state['rebuild'] = TRUE; // Force rebuild with next step.
+    // Force rebuild with next step.
+    $form_state['rebuild'] = TRUE;
   }
   else {
     // One subscription so set id/key pair.
@@ -244,6 +262,9 @@ function _acquia_agent_automatic_start_submit(&$form_state) {
   }
 }
 
+/**
+ * Needs comment.
+ */
 function acquia_agent_settings_credentials($form, &$form_state) {
   $form = array();
   $identifier = acquia_agent_settings('acquia_identifier');
@@ -327,7 +348,7 @@ function acquia_agent_settings_credentials_submit($form, &$form_state) {
   // Redirect to the path without the suffix.
   $form_state['redirect'] = array('admin/config/system/acquia-agent');
   cache_clear_all();
-  if ($active && count($active) > 1) {
+  if ($active && is_array($active) && count($active) > 1) {
     drupal_set_message(t('<h3>Connection successful!</h3>You are now connected to Acquia Cloud. Please enter a name for your site to begin sending profile data.'));
   }
 }
@@ -394,6 +415,7 @@ function acquia_agent_settings_form($form, &$form_state, $banner) {
       if (empty($error_message) && $ssl_available) {
         $error_message = 'There was an error in validating your subscription credentials. You may want to try disabling SSL peer verification by setting the variable acquia_agent_verify_peer to false.';
       }
+      // phpcs:ignore
       drupal_set_message(t($error_message), 'error', FALSE);
     }
   }
@@ -441,6 +463,9 @@ function acquia_agent_settings_submit($form, &$form_state) {
   drupal_set_message(t('The configuration options have been saved.'));
 }
 
+/**
+ * Needs comment.
+ */
 function theme_acquia_agent_banner_form($variables) {
   $form = $variables['form'];
   if (empty($form['banner'])) {
@@ -456,6 +481,9 @@ function theme_acquia_agent_banner_form($variables) {
   return $output;
 }
 
+/**
+ * Needs comment.
+ */
 function acquia_agent_an_info_header() {
   $path = drupal_get_path('module', 'acquia_agent');
 
@@ -464,22 +492,22 @@ function acquia_agent_an_info_header() {
   $output .= '<h2 id="an-info-header">' . t('Acquia Subscription', array('@acquia-network' => 'http://acquia.com/products-services/acquia-network')) . '</h2>';
   $output .= '<p class="an-slogan">' . t('A suite of products and services to create & maintain killer web experiences built on Drupal') . '</p>';
   $output .= '<div id="an-info-box">';
-  $output .=   '<div class="cell with-arrow an-left">';
-  $output .=     '<h2 class="cell-title"><i>' . t('Answers you need') . '</i></h2>';
-  $output .=     '<a href="http://library.acquia.com/" target="_blank">' . theme('image', array('path' => $path . '/images/icon-library.png')) . '</a>';
-  $output .=     '<p class="cell-p">' . t("Tap the collective knowledge of Acquia’s technical support team & partners.") . '</p>';
-  $output .=   '</div>';
-  $output .=   '<div class="cell with-arrow an-center">';
-  $output .=     '<h2 class="cell-title"><i>' . t('Tools to extend your site') . '</i></h2>';
-  $output .=     '<a href="http://www.acquia.com/products-services/acquia-network/cloud-services" target="_blank">' . theme('image', array('path' => $path . '/images/icon-tools.png')) . '</a>';
-  $output .=     '<p class="cell-p">' . t('Enhance and extend your site with an array of <a href="@services" target="_blank">services</a> from Acquia & our partners.', array('@services' => 'http://www.acquia.com/products-services/acquia-network/cloud-services')) . '</p>';
-  $output .=   '</div>';
-  $output .=   '<div class="cell an-right">';
-  $output .=     '<h2 class="cell-title"><i>' . t('Support when you want it') . '</i></h2>';
-  $output .=     '<a href="http://www.acquia.com/drupal-support" target="_blank">' . theme('image', array('path' => $path . '/images/icon-support.png')) . '</a>';
-  $output .=     '<p class="cell-p">' . t("Experienced Drupalists are available to support you whenever you need it.") . '</p>';
-  $output .=   '</div>';
-  $output .=  '</div>';
+  $output .= '<div class="cell with-arrow an-left">';
+  $output .= '<h2 class="cell-title"><i>' . t('Answers you need') . '</i></h2>';
+  $output .= '<a href="http://library.acquia.com/" target="_blank">' . theme('image', array('path' => $path . '/images/icon-library.png')) . '</a>';
+  $output .= '<p class="cell-p">' . t("Tap the collective knowledge of Acquia’s technical support team & partners.") . '</p>';
+  $output .= '</div>';
+  $output .= '<div class="cell with-arrow an-center">';
+  $output .= '<h2 class="cell-title"><i>' . t('Tools to extend your site') . '</i></h2>';
+  $output .= '<a href="http://www.acquia.com/products-services/acquia-network/cloud-services" target="_blank">' . theme('image', array('path' => $path . '/images/icon-tools.png')) . '</a>';
+  $output .= '<p class="cell-p">' . t('Enhance and extend your site with an array of <a href="@services" target="_blank">services</a> from Acquia & our partners.', array('@services' => 'http://www.acquia.com/products-services/acquia-network/cloud-services')) . '</p>';
+  $output .= '</div>';
+  $output .= '<div class="cell an-right">';
+  $output .= '<h2 class="cell-title"><i>' . t('Support when you want it') . '</i></h2>';
+  $output .= '<a href="http://www.acquia.com/drupal-support" target="_blank">' . theme('image', array('path' => $path . '/images/icon-support.png')) . '</a>';
+  $output .= '<p class="cell-p">' . t("Experienced Drupalists are available to support you whenever you need it.") . '</p>';
+  $output .= '</div>';
+  $output .= '</div>';
   $output .= '</div>';
   return $output;
 }

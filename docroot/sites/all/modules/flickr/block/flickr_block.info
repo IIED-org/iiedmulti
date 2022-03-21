@@ -6,9 +6,8 @@ configure = admin/structure/block
 dependencies[] = flickr
 dependencies[] = block
 
-; Information added by Drupal.org packaging script on 2015-08-06
-version = "7.x-1.8"
+; Information added by Drupal.org packaging script on 2020-03-07
+version = "7.x-1.9"
 core = "7.x"
 project = "flickr"
-datestamp = "1438860137"
-
+datestamp = "1583608631"
