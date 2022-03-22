@@ -11,3 +11,4 @@ $databases['default'] = array (
   )
 );
 $databases['default']['default']['host'] = 'ssm_db';
+$conf['file_temporary_path'] = '/tmp';
