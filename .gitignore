@@ -8,4 +8,4 @@ settings.local.php
 .DS_Store
 
 # Ignore .sql files
-.sql
+*.sql
