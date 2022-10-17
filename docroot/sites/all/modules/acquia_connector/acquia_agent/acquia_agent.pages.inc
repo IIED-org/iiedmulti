@@ -164,7 +164,7 @@ function acquia_agent_automatic_setup_form_validate($form, &$form_state) {
     $data = array('body' => $body, 'authenticator' => $authenticator);
     // Does not use acquia_agent_call() because Network identifier and key are
     // not available.
-    $server = variable_get('acquia_network_address', 'https://rpc.acquia.com');
+    $server = acquia_agent_settings('acquia_network_address');
     $result = _acquia_agent_request(acquia_agent_network_address($server), 'acquia.agent.communication.settings', $data);
 
     if ($errno = xmlrpc_errno() !== NULL) {
@@ -227,7 +227,7 @@ function _acquia_agent_automatic_start_submit(&$form_state) {
   $data = array('body' => $body, 'authenticator' => $authenticator);
   // Does not use acquia_agent_call() because Network identifier and key are not
   // available.
-  $server = variable_get('acquia_network_address', 'https://rpc.acquia.com');
+  $server = acquia_agent_settings('acquia_network_address');
 
   $result = _acquia_agent_request(acquia_agent_network_address($server), 'acquia.agent.subscription.credentials', $data);
 
@@ -308,7 +308,7 @@ function acquia_agent_settings_credentials_validate($form, &$form_state) {
   $key = $form_state['values']['acquia_key'];
   // Validate credentials and get subscription name.
   $body = array('identifier' => $identifier);
-  $data = acquia_agent_call('acquia.agent.subscription.name', $body, $identifier, $key, variable_get('acquia_network_address', 'https://rpc.acquia.com'));
+  $data = acquia_agent_call('acquia.agent.subscription.name', $body, $identifier, $key);
 
   $error = NULL;
   if ($errno = xmlrpc_errno()) {
@@ -362,7 +362,7 @@ function _acquia_agent_setup_subscription_name() {
 
   // Get subscription name.
   $body = array('identifier' => $identifier);
-  $data = acquia_agent_call('acquia.agent.subscription.name', $body, $identifier, $key, variable_get('acquia_network_address', 'https://rpc.acquia.com'));
+  $data = acquia_agent_call('acquia.agent.subscription.name', $body, $identifier, $key);
 
   if ($errno = xmlrpc_errno()) {
     $error = TRUE;

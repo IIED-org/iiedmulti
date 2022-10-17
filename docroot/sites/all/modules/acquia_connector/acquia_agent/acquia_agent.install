@@ -200,3 +200,18 @@ function acquia_agent_update_7001() {
   variable_del('acquia_migrate_max_time');
   variable_del('acquia_agent_cloud_migration');
 }
+
+/**
+ * Uninstall Acquia SPI module.
+ */
+function acquia_agent_update_7002() {
+  module_disable(['acquia_spi']);
+  drupal_uninstall_modules(['acquia_spi']);
+}
+
+/**
+ * Update the API address.
+ */
+function acquia_agent_update_7003() {
+  variable_set('acquia_network_address', 'https://nspi.acquia.com');
+}

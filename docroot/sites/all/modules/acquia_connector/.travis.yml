@@ -45,6 +45,7 @@ install:
   - sudo service apache2 restart
 
   # Install dependencies for testing.
+  - composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
   - composer install
 
   # Download Drupal.
@@ -60,7 +61,7 @@ before_script:
 
   # Copy over the Acquia Connector repo and enable it.
   - cp -r $TRAVIS_BUILD_DIR $DRUPAL_DIR/sites/all/modules/
-  - drush --root=$DRUPAL_DIR en --yes acquia_agent acquia_spi acquia_search
+  - drush --root=$DRUPAL_DIR en --yes acquia_agent acquia_search
   - drush --root=$DRUPAL_DIR cc all
 
 script:

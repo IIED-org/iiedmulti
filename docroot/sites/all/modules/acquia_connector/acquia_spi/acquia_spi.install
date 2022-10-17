@@ -5,7 +5,13 @@
  * Installer file for Acquia SPI module.
  */
 
-// -- Core hooks ---------------------------------------------------------------
+/**
+ * Implements hook_install().
+ */
+function acquia_spi_install() {
+  module_disable(['acquia_spi']);
+  drupal_uninstall_modules(['acquia_spi']);
+}
 
 /**
  * Implements hook_uninstall().

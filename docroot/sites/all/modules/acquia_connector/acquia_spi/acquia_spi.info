@@ -1,13 +1,14 @@
-name = Acquia Site Profile Information
+name = Acquia Site Profile Information (Deprecated)
 description = "Sends detailed information about your Drupal site (status, info, debugging, etc...) to Acquia Insight."
 package = Acquia Connector
 core = 7.x
 dependencies[] = acquia_agent
 dependencies[] = taxonomy
-files[] = tests/acquia_spi.test
+hidden = true
+;files[] = tests/acquia_spi.test
 
-; Information added by Drupal.org packaging script on 2022-03-18
-version = "7.x-3.10"
+; Information added by Drupal.org packaging script on 2022-09-12
+version = "7.x-3.11"
 core = "7.x"
 project = "acquia_connector"
-datestamp = "1647641926"
+datestamp = "1663001237"
