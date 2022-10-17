@@ -19,8 +19,8 @@ files[] = includes/AcquiaSearchSolrPreferredIndex.php
 files[] = includes/AcquiaSearchSolrService.php
 files[] = tests/acquia_search.test
 
-; Information added by Drupal.org packaging script on 2022-03-18
-version = "7.x-3.10"
+; Information added by Drupal.org packaging script on 2022-09-12
+version = "7.x-3.11"
 core = "7.x"
 project = "acquia_connector"
-datestamp = "1647641926"
+datestamp = "1663001237"

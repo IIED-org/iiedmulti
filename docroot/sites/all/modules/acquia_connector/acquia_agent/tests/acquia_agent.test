@@ -499,4 +499,11 @@ class AquiaAgentUnitTestCase extends DrupalUnitTestCase {
     $this->assertIdentical(acquia_agent_get_server_superglobal(), $_SERVER, 'acquia_agent_get_server_superglobal() returns expected value');
   }
 
+  /**
+   * Tests acquia_agent_network_address.
+   */
+  public function testAcquiaAgentNetworkAddress() {
+    $this->assertEqual('https://nspi.acquia.com', acquia_agent_network_address());
+  }
+
 }
