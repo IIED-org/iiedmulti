@@ -4,7 +4,8 @@ config:
   acli_version: latest
   ah_application_uuid: 2201d573-ca9b-4833-8966-bb7531b99019
   ah_site_group: iiedmulti
-  php: '7.4'
+  php: '8.1'
+  drush: '8.4.10'
   conf:
     php: lando/php/php.ini
     appserver:

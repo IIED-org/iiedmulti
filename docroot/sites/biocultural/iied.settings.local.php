@@ -12,3 +12,4 @@ $databases['default'] = array (
 );
 
 $databases['default']['default']['host'] = 'biocultural_db';
+$conf['file_temporary_path'] = '/tmp';
