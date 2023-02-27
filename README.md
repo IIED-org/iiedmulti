@@ -8,11 +8,11 @@ Clone this repo and copy the `iied.local.settings` files found in each relevant 
 
 `lando [acli] pull` deosn't work for multisite databases so you will need to download a copy of the database you want to work on from the Acquia Cloud web interface to the local repo root and import it using the following command:
 
-`lando db-import --host [biocultural|ssm|urbden]_db <database.sql>`
+`lando db-import --host [biocultural|ssm|urbden] <database.sql>`
 
 For example:
 
-`lando db-import --host biocultural_db prod-biocultural-iiedmultidb258069-2022-03-21.sql`
+`lando db-import --host biocultural prod-biocultural-iiedmultidb258069-2022-03-21.sql`
 
 Local drush commands can be run either from the relevant docroot/sites/ subdirectory or using the `-l` flag e.g.
 

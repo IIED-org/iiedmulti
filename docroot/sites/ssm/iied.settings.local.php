@@ -10,5 +10,5 @@ $databases['default'] = array (
     'port' => 3306,
   )
 );
-$databases['default']['default']['host'] = 'ssm_db';
+$databases['default']['default']['host'] = 'ssm';
 $conf['file_temporary_path'] = '/tmp';

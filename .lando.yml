@@ -15,15 +15,15 @@ proxy:
     - urbden.lndo.site
     - ssm.lndo.site
 services:
-  biocultural_db:
+  biocultural:
     type: mysql:5.7
     config:
       confd: lando/mysql/conf.d
-  urbden_db:
+  urbden:
     type: mysql:5.7
     config:
       confd: lando/mysql/conf.d
-  ssm_db:
+  ssm:
     type: mysql:5.7
     config:
       confd: lando/mysql/conf.d
