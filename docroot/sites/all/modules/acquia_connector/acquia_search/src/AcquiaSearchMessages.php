@@ -1,7 +1,13 @@
 <?php
 
+namespace Drupal\acquia_search;
+
+use function l;
+use function t;
+use function theme;
+
 /**
- * Class AcquiaSearchSolrMessages.
+ * Static method class for printing Search Messages.
  */
 class AcquiaSearchSolrMessages {
 
@@ -50,13 +56,13 @@ class AcquiaSearchSolrMessages {
   /**
    * Returns formatted message for search environment in read-only mode.
    *
-   * @param array $environment
-   *   Search environment.
+   * @param array $possible_cores
+   *   Possible cores.
    *
    * @return string
    *   Message text.
    */
-  public static function readOnlyModeMessage(array $environment) {
+  public static function readOnlyModeMessage(array $possible_cores) {
     $message = t(
       'To protect your data, Acquia Search Solr module is enforcing
     read-only mode, because it could not figure out what Acquia-hosted Solr
@@ -64,8 +70,8 @@ class AcquiaSearchSolrMessages {
     if you copy your site to a development or other environment(s).'
     );
 
-    if (!empty($environment['acquia_search_solr_possible_indexes'])) {
-      $list = theme('item_list', ['items' => $environment['acquia_search_solr_possible_indexes']]);
+    if (!empty($possible_cores)) {
+      $list = theme('item_list', ['items' => $possible_cores]);
       $message .= '<p>' . t('These index IDs would have worked, but could not be found on your Acquia subscription: !list', ['!list' => $list]) . '</p>';
     }
 
@@ -73,44 +79,6 @@ class AcquiaSearchSolrMessages {
     $message .= t('To fix this problem, please read !link.', ['!link' => $link]);
 
     return $message;
-  }
-
-  /**
-   * Returns connection status message for search environment.
-   *
-   * @param array $environment
-   *   Search environment.
-   *
-   * @return mixed
-   *   Message text.
-   */
-  public static function getSearchStatusMessage(array $environment) {
-    $items = [
-      t('apachesolr.module environment ID: @env', ['@env' => $environment['env_id']]),
-      t('URL: @url', ['@url' => $environment['url']]),
-    ];
-
-    if (AcquiaSearchSolrEnvironment::ping($environment['env_id'])) {
-      $items[] = self::pingSuccessful();
-    }
-    else {
-      $items[] = ['data' => self::pingFailed(), 'class' => ['error']];
-    }
-
-    // Ping the Solr index to ensure authentication is working.
-    if (AcquiaSearchSolrEnvironment::pingWithAuthCheck($environment['env_id'])) {
-      $items[] = self::authenticationChecksSuccess();
-    }
-    else {
-      $items[] = [
-        'data' => self::authenticationChecksFailed(),
-        'class' => ['error'],
-      ];
-    }
-
-    $list = theme('item_list', ['items' => $items]);
-
-    return t('Connection managed by Acquia Search module. !list', ['!list' => $list]);
   }
 
   /**

@@ -5,31 +5,33 @@
  * Drush integration for acquia_search.
  */
 
+use Drupal\acquia_search\ApacheSolrEnvironment;
+
 /**
  * Implements hook_drush_command().
  */
 function acquia_search_drush_command() {
-  $items = array();
+  $items = [];
 
-  $items['solr-set-derived-key'] = array(
+  $items['solr-set-derived-key'] = [
     'callback' => 'acquia_search_set_derived_key_for_env',
     'description' => dt('Sets an environment to be active for Acquia search using a specific derived key.
       You should use your Acquia Identifier and Network Key to set this value.'),
-    'options' => array(
-      'env-id' => array(
+    'options' => [
+      'env-id' => [
         'description' => 'Apache Solr environment id.',
-      ),
-      'acquia-id' => array(
+      ],
+      'acquia-id' => [
         'description' => 'Acquia Network Subscription ID.',
-      ),
-      'acquia-key' => array(
+      ],
+      'acquia-key' => [
         'description' => 'Acquia Network Subscription Key.',
-      ),
-    ),
-    'examples' => array(
+      ],
+    ],
+    'examples' => [
       'drush solr-set-derived-key --env-id=acquia_search_server_1_1 --acquia-id=AAAA-12345 --acquia-key=abcdefgijklmnopqrstuvw12345' => 'Set this environment to use the following keys.',
-    ),
-  );
+    ],
+  ];
   return $items;
 }
 
@@ -56,16 +58,23 @@ function acquia_search_drush_help($section) {
  * customers to set any environment as an acquia environment.
  */
 function acquia_search_set_derived_key_for_env() {
+  drush_print(dt("This command was specific to Search v2. It can be safely removed."));
+  return TRUE;
+
+  // The following code is kept for future use. Specifically, adding the ability
+  // for users to specify different subscriptions per search server.
+  acquia_search_include();
   // Environment id.
   $env_id = drush_get_option('env-id');
   // Check on bool, because drush sets the var as true if no value is given.
   if (empty($env_id) || is_bool($env_id)) {
     return drush_set_error('DRUSH_VARIABLE_ERROR', dt('No apachesolr environment id specified'));
   }
-  if ($env_id == ACQUIA_SEARCH_ENVIRONMENT_ID) {
+  $environment = new ApacheSolrEnvironment($env_id);
+  // Deny overridding the default acquia environments.
+  if ($env_id == 'acquia_search_server_1' || $env_id == 'acquia_search_server_3') {
     return drush_set_error('DRUSH_VARIABLE_ERROR', dt('Modifying the original Acquia Search subscription is not allowed. Please use another environment'));
   }
-  $environment = apachesolr_environment_load($env_id);
   // Check if the environment is valid.
   if (empty($environment)) {
     return drush_set_error('DRUSH_ACQUIA_ERROR', dt('The specified environment does not exist'));
@@ -85,10 +94,10 @@ function acquia_search_set_derived_key_for_env() {
 
   // We do not want to send a heartbeat to the server, we only need subscription
   // data.
-  $params = array(
+  $params = [
     'active' => FALSE,
     'no_heartbeat' => 1,
-  );
+  ];
   $subscription = acquia_agent_get_subscription($params, $acquia_id, $acquia_key);
   // Check if the subscription was valid.
   if (!is_array($subscription)) {
@@ -98,11 +107,11 @@ function acquia_search_set_derived_key_for_env() {
   // We use a salt from acquia.com in key derivation since this is a shared
   // value that we could change on the AN side if needed to force any
   // or all clients to use a new derived key.
-  $salt = isset($subscription['derived_key_salt']) ? $subscription['derived_key_salt'] : '';
+  $salt = $subscription['derived_key_salt'] ?? '';
   if (empty($salt)) {
     return drush_set_error('DRUSH_ACQUIA_ERROR', dt('Could not get a salt.'));
   }
-  $derived_key = _acquia_search_create_derived_key($salt, $acquia_id, $acquia_key);
+  $derived_key = AcquiaSearchAuth::createDerivedKey($salt, $acquia_id, $acquia_key);
   if (!empty($derived_key)) {
     $environment['url'] = 'http://search.acquia.com/solr/' . $acquia_id;
     // We want to show that this specific environment was connected to Acquia.

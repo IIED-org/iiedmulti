@@ -3,12 +3,10 @@ description = "Sends detailed information about your Drupal site (status, info, 
 package = Acquia Connector
 core = 7.x
 dependencies[] = acquia_agent
-dependencies[] = taxonomy
 hidden = true
-;files[] = tests/acquia_spi.test
 
-; Information added by Drupal.org packaging script on 2022-09-12
-version = "7.x-3.11"
+; Information added by Drupal.org packaging script on 2023-01-27
+version = "7.x-4.3"
 core = "7.x"
 project = "acquia_connector"
-datestamp = "1663001237"
+datestamp = "1674836922"

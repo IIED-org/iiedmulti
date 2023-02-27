@@ -36,7 +36,7 @@ Installation
 --------------------------------------------------------------------------------
 
 Consult the online documentation at
-https://docs.acquia.com/acquia-cloud/insight/install/ for installation
+https://docs.acquia.com/cloud-platform/onboarding/install/ for installation
 instructions.
 
 Notes on Acquia Search data protection and index auto-switching

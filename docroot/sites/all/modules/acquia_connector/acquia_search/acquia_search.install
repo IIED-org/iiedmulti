@@ -9,7 +9,7 @@
  * Implements hook_requirements().
  */
 function acquia_search_requirements($phase) {
-  $requirements = array();
+  $requirements = [];
   // Ensure translations don't break at install time.
   $t = get_t();
 
@@ -23,62 +23,52 @@ function acquia_search_requirements($phase) {
     else {
       $severity = REQUIREMENT_ERROR;
     }
-    $requirements['acquia_search_credentials'] = array(
+    $requirements['acquia_search_credentials'] = [
       'description' => $t('In order to use Acquia search module you must have an Acquia subscription. Please enter your Acquia subscription keys.'),
       'severity' => $severity,
       'value' => '',
-    );
+    ];
 
   }
   if ($phase == 'runtime') {
     // Check SSL support.
     if (in_array('ssl', stream_get_transports(), TRUE)) {
       $severity = REQUIREMENT_OK;
-      $requirements['acquia_search_ssl'] = array(
+      $requirements['acquia_search_ssl'] = [
         'description' => $t('The Acquia Search module is using SSL to protect the privacy of your content.'),
-      );
+      ];
     }
     else {
       $severity = REQUIREMENT_WARNING;
-      $requirements['acquia_search_ssl'] = array(
+      $requirements['acquia_search_ssl'] = [
         'description' => $t('In order to protect the privacy of your content with the Acquia Search module you must have SSL support enabled in PHP on your host.'),
-      );
+      ];
     }
     $requirements['acquia_search_ssl']['title'] = $t('Acquia Search');
     $requirements['acquia_search_ssl']['severity'] = $severity;
     $requirements['acquia_search_ssl']['value'] = '';
 
-    // Show available search indexes.
-    $environments = apachesolr_load_all_environments();
-    foreach ($environments as $env_id => $environment) {
-      // Flag when read-only mode was forced because of not finding the right
-      // index.
-      if (isset($environment['overridden_by_acquia_search']) && $environment['overridden_by_acquia_search'] == ACQUIA_SEARCH_AUTO_OVERRIDE_READ_ONLY) {
-        $msg = acquia_search_get_read_only_mode_warning($environment, $t);
-        $requirements['acquia_search_read_only']['title'] = $t('Acquia Search');
-        $requirements['acquia_search_read_only']['severity'] = REQUIREMENT_WARNING;
-        $requirements['acquia_search_read_only']['value'] = $msg;
-        break;
-      }
-    }
-    // Flag if acquia_search_multi_subs module is enabled.
-    if (module_exists('acquia_search_multi_subs')) {
-      $requirements['acquia_search_read_only']['title'] = $t('Acquia Search');
-      $requirements['acquia_search_read_only']['severity'] = REQUIREMENT_WARNING;
-      $requirements['acquia_search_read_only']['value'] = $t(
-        'Warning: acquia_search_multi_subs.module is enabled, but most of its functionality is now included in the Acquia Search module. Please read <a href="@url">our documentation</a>.',
-        array('@url' => 'https://docs.acquia.com/acquia-search/multiple-cores')
-      );
+    // Disable acquia_search if neither of these modules are enabled.
+    if (!module_exists('apachesolr_search') && !module_exists('search_api_solr')) {
+      $requirements['acquia_search'] = [
+        'description' => $t('In order to use Acquia search module, you must enable Apache Solr Search or Search API.'),
+        'severity' => REQUIREMENT_ERROR,
+        'value' => '',
+      ];
+      return $requirements;
     }
 
-    // Check Apache Solr API version.
-    if (!defined('APACHESOLR_API_VERSION') || version_compare(APACHESOLR_API_VERSION, '3.0', '<')) {
-      $requirements['acquia_search_apachesolr']['title'] = $t('Acquia Search');
-      $requirements['acquia_search_apachesolr']['severity'] = REQUIREMENT_ERROR;
-      $requirements['acquia_search_apachesolr']['description'] = $t('Apache Solr API Integration requires  API version 3.0.  Please upgrade your Apache Solr Search Integration module');
-      $requirements['acquia_search_apachesolr']['value'] = $t('Incompatible API version');
+    // Apachesolr Specific Requirements.
+    if (module_exists('apachesolr_search')) {
+      array_merge($requirements, acquia_search_apachesolr_requirements());
+    }
+
+    // Search API Specific Requirements.
+    if (module_exists('search_api_solr')) {
+      array_merge($requirements, acquia_search_searchapi_requirements());
     }
   }
+
   // Update the cached version whenever we may be updating the module.
   if ($phase == 'runtime' || $phase == 'update') {
     _acquia_search_set_version();
@@ -91,48 +81,94 @@ function acquia_search_requirements($phase) {
  * Implements hook_enable().
  */
 function acquia_search_enable() {
+  // Ensure translations don't break at install time.
+  $t = get_t();
+  $modules = [];
+  if (module_exists('search_api_solr')) {
+    $modules[] = 'search_api_solr';
+  }
+  if (module_exists('apachesolr_search')) {
+    $modules[] = 'apachesolr_search';
+  }
+  if (!empty($modules)) {
+    acquia_search_modules_enabled($modules);
+  }
+  else {
+    $error = $t('Acquia Search requires Apachesolr Search or Search API Solr to be enabled.');
+    drupal_set_message($error, 'error');
+    watchdog('acquia_search', $error, NULL, WATCHDOG_ERROR);
+    module_disable(['acquia_search']);
+    return;
+  }
+
   // Send a heartbeat so the Acquia Subscription knows the module is enabled.
   // This causes an invocation of hook_acquia_subscription_status() which is
   // implemented in this module to set up the environment.
   _acquia_search_set_version();
-  acquia_agent_check_subscription();
+}
+
+/**
+ * Implements hook_modules_enable().
+ *
+ * This function is also called from hook_enable to prevent duplicate code.
+ */
+function acquia_search_modules_enabled($modules) {
+  // Include relevant search files before enabling the server.
+  acquia_search_include();
+
+  // Add Acquia Search to existing servers.
+  // Note: if both modules are enabled, the service will be created on both.
+  if (in_array('search_api_solr', $modules)) {
+    $legacy_servers = search_api_server_load_multiple(FALSE, ['class' => 'SearchApiAcquiaSearchService']);
+    if ($legacy_servers) {
+      acquia_search_searchapi_upgrade_servers($legacy_servers);
+    }
+
+    // Disable Search API Acquia module.
+    if (module_exists('search_api_acquia')) {
+      module_disable(['search_api_acquia']);
+      watchdog('acquia_search', 'Search API Acquia has been disabled. You can safely remove it from your codebase.', '', WATCHDOG_INFO);
+    }
+  }
+
+  // Disable/throw an error if Search API Acquia is enabled.
+  if (in_array('search_api_acquia', $modules)) {
+    // Set install server flag, we will check credentials later.
+    module_disable(['search_api_acquia']);
+    watchdog('acquia_search', 'This version of Acquia Search is incompatible with Search Api Acquia.', '', WATCHDOG_ERROR);
+  }
 }
 
 /**
  * Implements hook_disable().
  */
 function acquia_search_disable() {
-  // Remove the base Acquia Search environment we added.
-  apachesolr_environment_delete(ACQUIA_SEARCH_ENVIRONMENT_ID);
-  apachesolr_environment_delete(ACQUIA_SEARCH_V3_ENVIRONMENT_ID);
-  // Unset all other acquia search environments.
-  $environments = apachesolr_load_all_environments();
-  foreach ($environments as $environment) {
-    if (!empty($environment['service_class']) &&
-      $environment['service_class'] === AcquiaSearchSolrService::class) {
-      // Remove traces of acquia_search.
-      // Unset our acquia url and set it back to default.
-      $environment['url'] = 'http://localhost:8983/solr';
-      // Emptying the service class, unsetting it would not work, since it would
-      // not overwrite the old value.
-      $environment['service_class'] = '';
-      apachesolr_environment_save($environment);
+
+  if (module_exists('apachesolr_search')) {
+    // Unset all acquia search environments.
+    $environments = apachesolr_load_all_environments();
+    foreach ($environments as $environment) {
+      if (!empty($environment['service_class'])) {
+        $rc = new ReflectionClass($environment['service_class']);
+        if (in_array('Drupal\acquia_search\AcquiaSearchConnectionInterface', $rc->getInterfaceNames())) {
+          // Remove traces of acquia_search.
+
+          apachesolr_environment_delete($environment['env_id']);
+        }
+      }
     }
   }
-  variable_del('acquia_search_derived_key_salt');
-  variable_del('apachesolr_default_environment');
-  // Make sure apachesolr search is the default search module.
-  variable_set('search_default_module', 'apachesolr_search');
+
 }
 
 /**
  * Helper function for hook_install().
  */
-function _acquia_search_find_block_region($block_regions = array()) {
-  $regions_to_look_for = array(
+function _acquia_search_find_block_region($block_regions = []) {
+  $regions_to_look_for = [
     'left', /* garland & zen */
     'sidebar_first', /* acquia */
-  );
+  ];
 
   if ($matches = array_intersect($block_regions, $regions_to_look_for)) {
     return array_shift($matches);
@@ -154,6 +190,28 @@ function _acquia_search_get_default_facets() {
  * Implements hook_uninstall().
  */
 function acquia_search_uninstall() {
+
+  if (module_exists('apachesolr_search')) {
+    // Unset all acquia search environments.
+    $environments = apachesolr_load_all_environments();
+    foreach ($environments as $environment) {
+      if (!empty($environment['service_class'])) {
+        $rc = new ReflectionClass($environment['service_class']);
+        if (in_array('Drupal\acquia_search\AcquiaSearchConnectionInterface', $rc->getInterfaceNames())) {
+          // Remove traces of acquia_search.
+          apachesolr_environment_delete($environment['env_id']);
+        }
+      }
+    }
+    // Make sure apachesolr search is the default search module.
+    variable_set('search_default_module', 'apachesolr_search');
+  }
+
+  // Delete Acquia Search specific variables.
+  variable_del('acquia_search_searchapi_created');
+  variable_del('acquia_search_apachesolr_created');
+  variable_del('acquia_search_derived_key_salt');
+  variable_del('apachesolr_default_environment');
   variable_del('acquia_search_derived_key_salt');
   variable_del('acquia_search_solr_core');
 }
@@ -188,4 +246,58 @@ function acquia_search_update_7002() {
   if ($class && strpos($class, 'Acquia') === 0) {
     variable_del('apachesolr_service_class');
   }
+}
+
+/**
+ * Update ApacheSolr service classes for V2 and V3 solr.
+ */
+function acquia_search_update_7003() {
+  $environments = apachesolr_load_all_environments();
+  foreach ($environments as $environment) {
+    if ($environment['service_class'] == 'AcquiaSearchSolrService') {
+      $environment['service_class'] = 'AcquiaSearchV3ApacheSolr';
+      apachesolr_environment_save($environment);
+    }
+  }
+}
+
+/**
+ * Upgrade Search API Acquia Servers to Acquia Search.
+ */
+function acquia_search_update_7401() {
+  if (module_exists('search_api_solr')) {
+    $search_api_acquia_servers = search_api_server_load_multiple(FALSE, ['class' => 'SearchApiAcquiaSearchService']);
+    if ($search_api_acquia_servers) {
+      acquia_search_searchapi_upgrade_servers($search_api_acquia_servers);
+    }
+  }
+  // Disable Search API Acquia module.
+  if (module_exists('search_api_acquia')) {
+    module_disable(['search_api_acquia']);
+    watchdog('acquia_search', 'Search API Acquia has been disabled. You can safely remove it from your codebase.', '', WATCHDOG_INFO);
+  }
+}
+
+/**
+ * Set the correct solr servlet path and params when using apachesolr_attachments module.
+ */
+function acquia_search_update_7402() {
+  if (!module_exists("apachesolr_attachments")) {
+    return;
+  }
+
+  $extract_method = variable_get('apachesolr_attachments_extract_using');
+  if ($extract_method != "solr") {
+    return;
+  }
+
+  variable_set("apachesolr_attachments_extracting_servlet_path", "update/extract");
+  variable_set("apachesolr_attachments_extracting_servlet_params", "extractOnly=true");
+}
+
+/**
+ * Registry Rebuild the info file for new classes.
+ */
+function acquia_search_update_7403() {
+  registry_rebuild();
 }

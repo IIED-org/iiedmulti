@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-Ruleset -->
-<ruleset name="Example">
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd"
+>
 
-  <description>An example PHP CodeSniffer configuration.</description>
+  <description>PHP CodeSniffer configuration for analyzing packages with ORCA.</description>
 
   <arg name="colors"/>
   <arg name="cache" value=".phpcs-cache"/>
@@ -11,10 +13,10 @@
 
   <file>.</file>
 
-  <arg name="extensions" value="php,module,inc,install,test,profile,theme,css,info,txt,md,yml"/>
+  <exclude-pattern>.idea/</exclude-pattern>
+  <exclude-pattern>var/</exclude-pattern>
+  <exclude-pattern>vendor/</exclude-pattern>
 
-  <exclude-pattern>vendor/*</exclude-pattern>
-
-  <rule ref="Drupal"/>
+  <rule ref="AcquiaDrupalTransitional"/>
 
 </ruleset>

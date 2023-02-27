@@ -8,11 +8,12 @@
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
-        "drupal/coder": "8.3.9"
+        "acquia/coding-standards": "^0.8.0",
+        "drupal/coder": "^8.3.9"
     },
     "extra": {
         "branch-alias": {
-            "dev-3.x": "3.x-dev"
+            "dev-4.x": "4.x-dev"
         },
         "phpcodesniffer-search-depth": 4
     }
