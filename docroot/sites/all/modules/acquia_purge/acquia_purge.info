@@ -6,28 +6,44 @@ dependencies[] = expire (>=2.0-rc2)
 
 ; The order of the files specified here is of absolute importance, since each
 ; file is ordered according to code composition. See _acquia_purge_load().
-files[] = AcquiaPurgeService.php
-files[] = processor/AcquiaPurgeProcessorsService.php
-files[] = processor/AcquiaPurgeProcessorInterface.php
-files[] = processor/AcquiaPurgeProcessorBase.php
-files[] = processor/backend/AcquiaPurgeAjaxProcessor.php
-files[] = processor/backend/AcquiaPurgeCronProcessor.php
-files[] = processor/backend/AcquiaPurgeRuntimeProcessor.php
-files[] = state/AcquiaPurgeStateItemInterface.php
-files[] = state/AcquiaPurgeStateStorageInterface.php
-files[] = state/AcquiaPurgeStateItem.php
-files[] = state/AcquiaPurgeStateCounterInterface.php
-files[] = state/AcquiaPurgeStateCounter.php
-files[] = state/AcquiaPurgeStateStorageBase.php
-files[] = state/backend/AcquiaPurgeDiskStateStorage.php
-files[] = state/backend/AcquiaPurgeMemcachedStateStorage.php
-files[] = queue/AcquiaPurgeQueueInterface.php
-files[] = queue/backend/AcquiaPurgeEfficientQueue.php
-files[] = queue/backend/AcquiaPurgeSmartQueue.php
+files[] = lib/AcquiaPurgeService.php
+files[] = lib/AcquiaPurgeHostingInfo.php
+files[] = lib/AcquiaPurgeDiagnostics.php
+files[] = lib/AcquiaPurgeOddities.php
+files[] = lib/AcquiaPurgeCapacity.php
+files[] = lib/processor/AcquiaPurgeProcessorsService.php
+files[] = lib/processor/AcquiaPurgeProcessorInterface.php
+files[] = lib/processor/AcquiaPurgeProcessorBase.php
+files[] = lib/processor/AcquiaPurgeProcessorAjax.php
+files[] = lib/processor/AcquiaPurgeProcessorCron.php
+files[] = lib/processor/AcquiaPurgeProcessorRuntime.php
+files[] = lib/state/AcquiaPurgeStateItemInterface.php
+files[] = lib/state/AcquiaPurgeStateStorageInterface.php
+files[] = lib/state/AcquiaPurgeStateItem.php
+files[] = lib/state/AcquiaPurgeStateCounterInterface.php
+files[] = lib/state/AcquiaPurgeStateCounter.php
+files[] = lib/state/AcquiaPurgeStateStorageBase.php
+files[] = lib/state/AcquiaPurgeStateStorageDisk.php
+files[] = lib/state/AcquiaPurgeStateStorageMemcache.php
+files[] = lib/queue/AcquiaPurgeQueueStatusInterface.php
+files[] = lib/queue/AcquiaPurgeQueueStatusTrait.php
+files[] = lib/queue/AcquiaPurgeQueueItemInterface.php
+files[] = lib/queue/AcquiaPurgeQueueItem.php
+files[] = lib/queue/AcquiaPurgeQueueInterface.php
+files[] = lib/queue/AcquiaPurgeQueueEfficient.php
+files[] = lib/queue/AcquiaPurgeQueueSmart.php
+files[] = lib/invalidation/AcquiaPurgeInvalidationInterface.php
+files[] = lib/invalidation/AcquiaPurgeInvalidation.php
+files[] = lib/executor/AcquiaPurgeExecutorRequestInterface.php
+files[] = lib/executor/AcquiaPurgeExecutorRequest.php
+files[] = lib/executor/AcquiaPurgeExecutorInterface.php
+files[] = lib/executor/AcquiaPurgeExecutorBase.php
+files[] = lib/executor/AcquiaPurgeExecutorPageCache.php
+files[] = lib/executor/AcquiaPurgeExecutorAcquia.php
+files[] = lib/executor/AcquiaPurgeExecutorsService.php
 
-; Information added by Drupal.org packaging script on 2015-07-09
-version = "7.x-1.3"
+; Information added by Drupal.org packaging script on 2023-07-21
+version = "7.x-1.5"
 core = "7.x"
 project = "acquia_purge"
-datestamp = "1436439312"
-
+datestamp = "1689956675"

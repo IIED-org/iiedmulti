@@ -1,0 +1,11 @@
+{
+    "name": "drupal/acquia_purge",
+    "type": "drupal-module",
+    "description": "Provides integration to the Acquia Edge service for intelligent cache purging.",
+    "license": "GPL-2.0-or-later",
+    "extra": {
+        "branch-alias": {
+            "dev-7.x-1.x": "1.x-dev"
+        }
+    }
+}

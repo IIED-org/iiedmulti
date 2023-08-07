@@ -87,18 +87,20 @@ function acquia_purge_autocomplete($string) {
  * UX rich form that lets administrative users purge paths manually.
  */
 function acquia_purge_manualpurge_form_full($form, &$form_state) {
+  $service = _acquia_purge_service();
+  $diagnostics = $service->diagnostics();
 
   // Do not render the full form if error conditions are found.
-  if (!_acquia_purge_are_we_allowed_to_purge()) {
+  if ($diagnostics->isSystemBlocked()) {
     include_once DRUPAL_ROOT . '/includes/install.inc';
     return array(
       'status' => array(
         '#type' => 'item',
-        '#title' => t("We're sorry, but due a critical error condition it is not possible to use this form. Please contact your administrator."),
+        '#title' => t("We're sorry, but due to a critical error condition it is not possible to use this form. Please contact your administrator."),
         '#markup' => theme(
           'status_report',
           array(
-            'requirements' => _acquia_purge_get_diagnosis(ACQUIA_PURGE_SEVLEVEL_ERROR),
+            'requirements' => $diagnostics->get(ACQUIA_PURGE_SEVLEVEL_ERROR),
           )
         ),
       ),
@@ -136,7 +138,7 @@ function acquia_purge_manualpurge_form_full($form, &$form_state) {
   }
 
   // Build up table rows with domains on the left and examples on the right.
-  $domains = _acquia_purge_get_domains($form, $form_state);
+  $domains = $service->hostingInfo()->getDomains();
   $rows = array();
   $rowsc = count($domains);
   if (count($examples) > count($domains)) {
@@ -144,8 +146,8 @@ function acquia_purge_manualpurge_form_full($form, &$form_state) {
   }
   for ($i = 0; $i < $rowsc; $i++) {
     $row = array();
-    $row[0] = isset($domains[$i]) ? $domains[$i] : '';
-    $row[1] = isset($examples[$i]) ? $examples[$i] : '';
+    $row[0] = $domains[$i] ?? '';
+    $row[1] = $examples[$i] ?? '';
     $rows[] = $row;
   }
   $form['guidancetable'] = array(
@@ -156,12 +158,13 @@ function acquia_purge_manualpurge_form_full($form, &$form_state) {
   );
 
   // Decorate the textfields and prepend URL's as helpful guide.
-  $schemes = _acquia_purge_get_protocol_schemes();
+  $schemes = $service->hostingInfo()->getSchemes();
   $base_path = _acquia_purge_variable('acquia_purge_base_path');
   $prefix = sprintf('<b>%s://%s%s</b>', $schemes[0], $domains[0], $base_path);
   foreach ($form['paths']['path'] as $i => $item) {
     $form['paths']['path'][$i]['#field_prefix'] = $prefix;
     $form['paths']['path'][$i]['#size'] = 30;
+    $form['paths']['path'][$i]['#maxlength'] = 2000;
   }
 
   return $form;
@@ -171,7 +174,7 @@ function acquia_purge_manualpurge_form_full($form, &$form_state) {
  * Bare bones form that lets administrative users purge paths manually.
  */
 function acquia_purge_manualpurge_form_paths($form, &$form_state) {
-  if (!_acquia_purge_are_we_allowed_to_purge()) {
+  if (_acquia_purge_service()->diagnostics()->isSystemBlocked()) {
     return array();
   }
 
@@ -193,7 +196,7 @@ function acquia_purge_manualpurge_form_paths($form, &$form_state) {
  * Single button form that lets administrative users purge the current page.
  */
 function acquia_purge_manualpurge_form_page($form, &$form_state) {
-  if (!_acquia_purge_are_we_allowed_to_purge()) {
+  if (_acquia_purge_service()->diagnostics()->isSystemBlocked()) {
     return array();
   }
 
@@ -257,6 +260,16 @@ function _acquia_purge_manualpurge_base(&$form, &$form_state) {
     );
   }
 
+  // Attach JS to override autocomplete behavior.
+  $form['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'acquia_purge') . '/js/autocomplete.js',
+    'type' => 'file',
+  );
+  $form['#attached']['js'][] = array(
+    'data' => array('acquia_purge' => _acquia_purge_get_file_extensions()),
+    'type' => 'setting',
+  );
+
   // Render the submit button and return the form.
   $form['submits'] = array('#weight' => 10);
   $form['submits']['paths'] = array(
@@ -278,7 +291,7 @@ function _acquia_purge_manualpurge_base(&$form, &$form_state) {
  *
  * @see _acquia_purge_manualpurge_base()
  */
-function __acquia_purge_manualpurge_add($form, &$form_state) {
+function _acquia_purge_manualpurge_add($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   $form_state['num_paths']++;
 }
@@ -288,7 +301,7 @@ function __acquia_purge_manualpurge_add($form, &$form_state) {
  *
  * @see _acquia_purge_manualpurge_base()
  */
-function __acquia_purge_manualpurge_remove($form, &$form_state) {
+function _acquia_purge_manualpurge_remove($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
   if ($form_state['num_paths'] > 1) {
     $form_state['num_paths']--;
@@ -300,7 +313,7 @@ function __acquia_purge_manualpurge_remove($form, &$form_state) {
  *
  * @see _acquia_purge_manualpurge_base()
  */
-function __acquia_purge_manualpurge_paths($form, &$form_state) {
+function _acquia_purge_manualpurge_paths($form, &$form_state) {
   return $form['paths'];
 }
 
@@ -310,7 +323,7 @@ function __acquia_purge_manualpurge_paths($form, &$form_state) {
  * @see acquia_purge_manualpurge_form_full()
  * @see acquia_purge_manualpurge_form_paths()
  */
-function __acquia_purge_manualpurge_validate($form, &$form_state) {
+function _acquia_purge_manualpurge_validate($form, &$form_state) {
   foreach ($form_state['values']['paths']['path'] as $id => $path) {
     if ($msg = _acquia_purge_input_validate($path)) {
       form_set_error('paths][path][' . $id, $msg);
@@ -325,7 +338,7 @@ function __acquia_purge_manualpurge_validate($form, &$form_state) {
  * @see acquia_purge_manualpurge_form_paths()
  * @see acquia_purge_manualpurge_form_page()
  */
-function __acquia_purge_manualpurge_submit($form, &$form_state) {
+function _acquia_purge_manualpurge_submit($form, &$form_state) {
   if (!isset($form_state['values']['paths']['path'])) {
     return;
   }
@@ -349,6 +362,16 @@ function __acquia_purge_manualpurge_submit($form, &$form_state) {
   if (count($form_state['values']['paths']['path'])) {
     _acquia_purge_service()->addPaths($form_state['values']['paths']['path']);
   }
+}
+
+/**
+ * Helper function to compile a list of file extensions.
+ */
+function _acquia_purge_get_file_extensions() {
+  $acquia_purge_settings = variable_get('acquia_purge_autocomplete_ignore_file_extensions',
+    variable_get('file_entity_default_allowed_extensions', 'jpg jpeg gif png txt doc docx xls xlsx pdf ppt pptx pps ppsx odt ods odp mp3 mov mp4 m4a m4v mpeg avi ogg oga ogv weba webp webm'),
+  );
+  return explode(' ', trim($acquia_purge_settings));
 }
 
 /**
@@ -383,7 +406,7 @@ function theme_acquia_purge_status_bar_widget(array $variables) {
   return theme('progress_bar', array(
     'percent' => $variables['percent'],
     'message' => $message,
-    )
+  )
   );
 }
 
@@ -391,7 +414,7 @@ function theme_acquia_purge_status_bar_widget(array $variables) {
  * Returns HTML for the status report.
  *
  * @param array $variables
- *   Requirements array as returned by _acquia_purge_get_diagnosis().
+ *   Requirements array as returned by AcquiaPurgeDiagnostics::get().
  *
  * @see theme_status_report()
  *
@@ -421,7 +444,7 @@ function theme_acquia_purge_status_report(array $variables) {
   // Require all requirement constants from the installer code.
   include_once DRUPAL_ROOT . '/includes/install.inc';
 
-  foreach ($variables as $requirement) {
+  foreach ($variables['diagnostics'] as $requirement) {
     if (empty($requirement) || !is_array($requirement)) {
       continue;
     }
@@ -430,11 +453,11 @@ function theme_acquia_purge_status_report(array $variables) {
 
     // Output table row(s)
     if (!empty($requirement['description'])) {
-      $output .= '<tr class="' . $severity['class'] . ' merge-down"><td class="status-title"><b>' . $requirement['name'] . '</b></td><td class="status-value">' . drupal_strtolower($requirement['value_plain']) . '</td></tr>';
+      $output .= '<tr class="' . $severity['class'] . ' merge-down"><td class="status-title"><b>' . $requirement['name'] . '</b></td><td class="status-value">' . $requirement['value_plain'] . '</td></tr>';
       $output .= '<tr class="' . $severity['class'] . ' merge-up"><td colspan="3" class="status-description">' . $requirement['description'] . '</td></tr>';
     }
     else {
-      $output .= '<tr class="' . $severity['class'] . '"><td class="status-title"><b>' . $requirement['name'] . '</b></td><td class="status-value">' . drupal_strtolower($requirement['value_plain']) . '</td></tr>';
+      $output .= '<tr class="' . $severity['class'] . '"><td class="status-title"><b>' . $requirement['name'] . '</b></td><td class="status-value">' . $requirement['value_plain'] . '</td></tr>';
     }
   }
 
