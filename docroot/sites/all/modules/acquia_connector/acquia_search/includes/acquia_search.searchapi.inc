@@ -299,6 +299,7 @@ function acquia_search_set_version() {
  *   Legacy (Search API Acquia) Servers.
  */
 function acquia_search_searchapi_upgrade_servers(array $legacy_servers) {
+  drupal_static_reset('search_api_get_service_info');
   foreach ($legacy_servers as $legacy_server) {
     /** @var SearchApiServer $legacy_server */
     $legacy_server->class = "AcquiaSearchApiService";

@@ -195,16 +195,18 @@ class AcquiaSubscription {
     if (isset($this->subscriptionData) && $refresh !== TRUE) {
       return $this->subscriptionData;
     }
-    $subscriptionData = variable_get('acquia_subscription_data', []);
-    if ($subscriptionData !== [] && $refresh !== TRUE) {
-      return $subscriptionData;
-    }
 
+    $subscriptionData = variable_get('acquia_subscription_data', []);
     // Only use default subscription data if the Application UUID changed.
     // This step gets hit if refresh is TRUE.
     if ($subscriptionData === [] ||
         (isset($subscriptionData['uuid']) && $subscriptionData['uuid'] !== $this->getSettings()->getApplicationUuid())) {
       $subscriptionData = $this->getDefaultSubscriptionData();
+      $refresh = TRUE;
+    }
+
+    if ($refresh !== TRUE) {
+      return $subscriptionData;
     }
 
     // Refresh from Acquia Cloud, if its available.

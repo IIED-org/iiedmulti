@@ -11,6 +11,40 @@
  */
 
 /**
+ * Register pre-flight diagnostic check functions.
+ *
+ * Each function referred to in these hook implementations, are called before
+ * Acquia Purge starts operating or when "drush ap-diagnosis" is called. These
+ * checks should be as lightweight as possible to prevent performance problems.
+ *
+ * Each function, is called with these parameters:
+ *   - string $t: Name of the t() function to call.
+ *   - AcquiaPurgeService $service: The Acquia Purge service.
+ *
+ * Each function, should return an associative array with these elements:
+ *   - title: The name of the requirement.
+ *   - value: The current value (e.g., version, time, level, etc).
+ *   - description: The description of the requirement/status.
+ *   - severity:
+ *       - ACQUIA_PURGE_SEVLEVEL_INFO
+ *       - ACQUIA_PURGE_SEVLEVEL_OK
+ *       - ACQUIA_PURGE_SEVLEVEL_WARNING
+ *       - ACQUIA_PURGE_SEVLEVEL_ERROR <-- blocks Acquia Purge from executing!
+ *
+ * If you need to load a file before your test functions get called, add this:
+ *   'module_load_include' => array('inc', 'mymodule', 'ap_diagnostics')
+ *
+ * @see acquia_purge.diagnostics.inc
+ */
+function hook_acquia_purge_diagnostics() {
+  return array(
+    'module_load_include' => array('inc', 'mymodule', 'ap_diagnostics'),
+    '_mymodule_ap_diagnostic_apikey',
+    '_mymodule_ap_diagnostic_apirate',
+  );
+}
+
+/**
  * Alter the list of domains Acquia Purge operates on.
  *
  * Modules may implement this hook to influence the domain names Acquia Purge
@@ -18,18 +52,10 @@
  * discouraged to do this, it does make sense in complexer scenarios with many
  * domains that need to be reduced to stay under the diagnostic limit.
  *
- * Adding domains MUST always happen through _acquia_purge_get_domains_add()
- * as this guards domain normalization and de-duplication, and removing domains
- * is as simple as calling unset() on array items. Hook implementations get
- * called both when $conf['acquia_purge_domains'] has been set and when it has
- * not been set, its up to you to be aware of the data you are operating on.
- *
  * @param string[] $domains
- *   The entity info array, keyed by entity name.
+ *   Unassociative array with domain names as string values.
  *
- * @see _acquia_purge_get_domains()
- * @see _acquia_purge_get_domains_add()
- * @see _acquia_purge_get_diagnosis_domains()
+ * @see AcquiaPurgeHostingInfo::getDomains()
  */
 function hook_acquia_purge_domains_alter(array &$domains) {
   $blacklist = array('domain_a', 'domain_b');
@@ -39,22 +65,13 @@ function hook_acquia_purge_domains_alter(array &$domains) {
     }
   }
 
-  _acquia_purge_get_domains_add('my_domain', $domains);
+  $domains[] = 'my_domain';
 }
 
 /**
- * React after paths failed purging and have been released back to the queue.
+ * DEPRECATED: React after paths paths purged failed.
  *
- * @param string[] $paths
- *   Non-associative array of string values representing the failed paths.
- *
- * @warning
- *   Called implementations run within the lock that Acquia Purge processors
- *   claimed. It is important that your code is swift and does not break
- *   execution flow (e.g. die() or exit()) since that would keep the lock
- *   claimed until it expires.
- *
- * @see AcquiaPurgeService::process()
+ * @deprecated
  */
 function hook_acquia_purge_purge_failure(array $paths) {
   foreach ($paths as $path) {
@@ -63,23 +80,29 @@ function hook_acquia_purge_purge_failure(array $paths) {
 }
 
 /**
- * React after paths paths purged successfully and got deleted from the queue.
+ * DEPRECATED: React after paths paths purged successfully.
  *
- * @param string[] $paths
- *   Non-associative array of string values representing the purged paths.
- *
- * @warning
- *   Called implementations run within the lock that Acquia Purge processors
- *   claimed. It is important that your code is swift and does not break
- *   execution flow (e.g. die() or exit()) since that would keep the lock
- *   claimed until it expires.
- *
- * @see AcquiaPurgeService::process()
+ * @deprecated
  */
 function hook_acquia_purge_purge_success(array $paths) {
   foreach ($paths as $path) {
     drupal_set_message(t('"@path"', array('@path' => $path)));
   }
+}
+
+/**
+ * Register executor backends to run after Acquia Purge's core executors.
+ *
+ * @param string[] $paths
+ *   List of paths to files declaring AcquiaPurgeExecutorInterface derivatives.
+ *
+ * @see _acquia_purge_load()
+ * @see AcquiaPurgeExecutorsService::getRegisteredBackends()
+ * @see AcquiaPurgeExecutorBase
+ * @see AcquiaPurgeExecutorInterface
+ */
+function hook_acquia_purge_executors(&$paths) {
+  $paths[] = drupal_get_path('module', 'mymodule') . '/myExecutorBackend.php';
 }
 
 /**

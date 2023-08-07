@@ -87,7 +87,7 @@ function acquia_purge_drush_command() {
  */
 function drush_acquia_purge_ap_diagnosis($v = ACQUIA_PURGE_SEVLEVEL_INFO) {
   $oldverbosity = drush_get_context('DRUSH_VERBOSE');
-  $tests = _acquia_purge_get_diagnosis($v);
+  $tests = _acquia_purge_service()->diagnostics()->get($v);
 
   // Define a mapping between install.inc's requirement states and drush_log().
   $severitymap = array(
@@ -164,7 +164,7 @@ function _drush_acquia_purge_ap_diagnosis_log(array $test, $longest) {
     str_repeat(' ', $pad_maxlength - strlen($type)),
     drupal_strtoupper($test['name']),
     str_repeat(' ', $longest - strlen($test['name'])),
-    drupal_strtolower($test['value_plain'])
+    $test['value_plain']
   );
 
   // Print descriptions for warnings and errors.
@@ -182,13 +182,14 @@ function _drush_acquia_purge_ap_diagnosis_log(array $test, $longest) {
  * List all detected domain names that Acquia Purge will purge.
  */
 function drush_acquia_purge_ap_domains() {
+  $hostingInfo = _acquia_purge_service()->hostingInfo();
 
   // Stop invocation if we are not detecting Acquia Cloud heuristics.
-  if (!_acquia_purge_are_we_on_acquiacloud()) {
+  if (!$hostingInfo->isThisAcquiaCloud()) {
     return drush_set_error("You must be on Acquia Cloud to use Acquia Purge.");
   }
 
-  foreach (_acquia_purge_get_domains() as $domain) {
+  foreach ($hostingInfo->getDomains() as $domain) {
     printf("%s\n", $domain);
   }
 }
@@ -201,14 +202,15 @@ function drush_acquia_purge_ap_domains() {
  *   multiple separated paths are also accepted: "news contact node/1".
  */
 function drush_acquia_purge_ap_purge($paths = NULL) {
+  $service = _acquia_purge_service();
 
   // Stop invocation if we are not detecting Acquia Cloud heuristics.
-  if (!_acquia_purge_are_we_on_acquiacloud()) {
+  if (!$service->hostingInfo()->isThisAcquiaCloud()) {
     return drush_set_error("You must be on Acquia Cloud to use Acquia Purge.");
   }
 
   // Stop invocation if serious error conditions have been found.
-  if (!_acquia_purge_are_we_allowed_to_purge()) {
+  if ($service->diagnostics()->isSystemBlocked()) {
     return drush_acquia_purge_ap_diagnosis(ACQUIA_PURGE_SEVLEVEL_ERROR);
   }
 
@@ -228,7 +230,7 @@ function drush_acquia_purge_ap_purge($paths = NULL) {
   }
 
   // Add all paths and dispatch processing to ap-process.
-  _acquia_purge_service()->addPaths($paths);
+  $service->addPaths($paths);
   drush_acquia_purge_ap_process();
 }
 
@@ -236,15 +238,17 @@ function drush_acquia_purge_ap_purge($paths = NULL) {
  * Forget all scheduled purges and empty the queue.
  */
 function drush_acquia_purge_ap_forget() {
+  $service = _acquia_purge_service();
 
   // Stop invocation if we are not detecting Acquia Cloud heuristics.
-  if (!_acquia_purge_are_we_on_acquiacloud()) {
+  if (!$service->hostingInfo()->isThisAcquiaCloud()) {
     return drush_set_error("You must be on Acquia Cloud to use Acquia Purge.");
   }
 
   // Retrieve statistics, clear the queue and log to Drush.
-  $remaining = _acquia_purge_service()->stats('remaining');
-  _acquia_purge_service()->clear();
+  $remaining = $service->stats('remaining');
+  $service->clear();
+  $service->oddities()->wipe();
   drush_log(dt("Removed @remaining items from the queue.",
     array('@remaining' => $remaining)), 'ok');
 }
@@ -255,7 +259,7 @@ function drush_acquia_purge_ap_forget() {
 function drush_acquia_purge_ap_list() {
 
   // Stop invocation if we are not detecting Acquia Cloud heuristics.
-  if (!_acquia_purge_are_we_on_acquiacloud()) {
+  if (!_acquia_purge_service()->hostingInfo()->isThisAcquiaCloud()) {
     return drush_set_error("You must be on Acquia Cloud to use Acquia Purge.");
   }
 
@@ -275,7 +279,10 @@ function drush_acquia_purge_ap_list() {
  * Purge all queued items from the command line.
  */
 function drush_acquia_purge_ap_process(&$context = NULL) {
-  if (!_acquia_purge_are_we_allowed_to_purge()) {
+  $service = _acquia_purge_service();
+
+  // Block processing in case of diagnostic problems.
+  if ($service->diagnostics()->isSystemBlocked()) {
     drush_set_error(dt('Diagnostic error conditions were found, aborting.'));
     return drush_acquia_purge_ap_diagnosis(ACQUIA_PURGE_SEVLEVEL_ERROR);
   }
@@ -285,14 +292,19 @@ function drush_acquia_purge_ap_process(&$context = NULL) {
   //
   if (is_null($context)) {
 
+    // Block at the main thread if there's locking active.
+    if ($service->lockActive()) {
+      drush_set_error(dt('Locked, another process is running!'));
+    }
+
     // Retrieve the statistics and determine if processing is needed.
-    $stats = _acquia_purge_service()->stats();
+    $stats = $service->stats();
     if (!$stats['running']) {
       return drush_print("The purge queue is empty, done!");
     }
 
     // Define the batch operation we're going to conduct.
-    $steps = (int) ceil($stats['remaining'] / _acquia_purge_get_capacity());
+    $steps = (int) ceil($stats['remaining'] / $service->capacity()->queueClaimsLimit());
     $batch = array(
       'title' => dt('Purging'),
       'operations' => array(),
@@ -304,7 +316,7 @@ function drush_acquia_purge_ap_process(&$context = NULL) {
     }
 
     // Store state data as it else won't be available to the sub processes.
-    _acquia_purge_service()->state()->commit();
+    $service->state()->commit();
 
     // Kick off the batch process, which will start forking processes.
     batch_set($batch);
@@ -315,16 +327,16 @@ function drush_acquia_purge_ap_process(&$context = NULL) {
   // SUB PROCESS.
   else {
 
-    if (!_acquia_purge_service()->lockAcquire()) {
+    if (!$service->lockAcquire()) {
       return drush_print("Unable to acquire lock, ensure that all users "
         . "close their browser tabs as a different purge seems to be active!");
     }
 
     // Process the maximum amount of paths we can process during runtime.
-    printf("\n# %d items left...\n", _acquia_purge_service()->stats('remaining'));
-    if (_acquia_purge_service()->process()) {
+    printf("\n# %d items left...\n", $service->stats('remaining'));
+    if ($service->process()) {
       $printed_urls = array();
-      foreach (_acquia_purge_service()->history() as $url) {
+      foreach ($service->history() as $url) {
         if (!(in_array($url, $printed_urls))) {
           drush_log(dt("Purged: @url", array('@url' => $url)), 'ok');
           $printed_urls[] = $url;
@@ -333,10 +345,10 @@ function drush_acquia_purge_ap_process(&$context = NULL) {
     }
 
     // Inform the Batch API when the process is finished.
-    if (!_acquia_purge_service()->stats('running')) {
+    if (!$service->stats('running')) {
       $context['finished'] = 1;
       $context['message'] = dt("Queue processed successfully!");
     }
-    _acquia_purge_service()->lockRelease();
+    $service->lockRelease();
   }
 }

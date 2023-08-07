@@ -146,7 +146,9 @@ class AcquiaSearchSolrApi extends AcquiaSearchSolrApiBase implements AcquiaSearc
       return $cache->data;
     }
     $keys = $this->searchRequest('/v2/index/key', 'index_name=' . $index_name);
-    cache_set($cid, $keys, 'cache', REQUEST_TIME + (24 * 60 * 60));
+    if ($keys !== FALSE) {
+      cache_set($cid, $keys, 'cache', REQUEST_TIME + (24 * 60 * 60));
+    }
 
     return $keys;
   }

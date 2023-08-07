@@ -128,6 +128,9 @@ trait AcquiaSearchConnectionTrait {
 
     $string = !empty($options['data']) ? $options['data'] : NULL;
     $options['headers']['Cookie'] = $this->createAuthCookie($url, $nonce, $string);
+    if ($options['headers']['Cookie'] === '') {
+      throw new Exception('Could not build authentication cookie due to missing derived key for HMAC values.');
+    }
     $options['headers'] += $this->addUserAgentHeader();
     $options['context'] = acquia_agent_stream_context_create($url, 'acquia_search');
     if (!$options['context']) {
@@ -243,6 +246,9 @@ trait AcquiaSearchConnectionTrait {
     }
 
     $derived_key = $this->getDerivedKey();
+    if ($derived_key === '') {
+      return '';
+    }
 
     // @see http://stackoverflow.com/questions/2524680/check-whether-the-string-is-a-unix-timestamp
     if (!(is_numeric($time) && (int) $time == $time)) {

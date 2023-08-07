@@ -17,17 +17,61 @@
  *
  * @param string $new
  *   Suggested code replacement.
+ * @param string|null $caller
+ *   Caller that is deprecated, leave NULL for automatic backtrace lookup.
  */
-function _acquia_purge_deprecated($new) {
+function _acquia_purge_deprecated($new, $caller = NULL) {
   $msg = "!old() is deprecated, port your code to !new immediately!";
   $backtrace = debug_backtrace();
-  $caller = $backtrace[1]['function'];
+  if ($caller == NULL) {
+    $caller = $backtrace[1]['function'];
+  }
   $replacements = array('!old' => $caller, '!new' => $new);
   watchdog('acquia_purge', $msg, $replacements, WATCHDOG_WARNING);
 }
 
 /**
- * Retrieve a variable or state data property.
+ * DEPRECATED: Determine if critical error conditions exists disallowing purges.
+ *
+ * @deprecated
+ */
+function _acquia_purge_are_we_allowed_to_purge() {
+  _acquia_purge_deprecated('!_acquia_purge_service()->diagnostics()->isSystemBlocked()');
+  return !_acquia_purge_service()->diagnostics()->isSystemBlocked();
+}
+
+/**
+ * DEPRECATED: Determine whether we are running on Acquia Cloud or not.
+ *
+ * @deprecated
+ */
+function _acquia_purge_are_we_on_acquiacloud() {
+  _acquia_purge_deprecated('_acquia_purge_service()->hostingInfo()->isThisAcquiaCloud()');
+  return _acquia_purge_service()->hostingInfo()->isThisAcquiaCloud();
+}
+
+/**
+ * DEPRECATED: Determine if its safe to use memcached based features.
+ *
+ * @deprecated
+ */
+function _acquia_purge_are_we_using_memcached() {
+  _acquia_purge_deprecated('_acquia_purge_service()->hostingInfo()->isMemcachedUsed()');
+  return _acquia_purge_service()->hostingInfo()->isMemcachedUsed();
+}
+
+/**
+ * DEPRECATED: Turn a PHP variable into a string for debugging.
+ *
+ * @deprecated
+ */
+function _acquia_purge_export_debug_symbols($symbols) {
+  _acquia_purge_deprecated('AcquiaPurgeExecutorBase::exportDebugSymbols()');
+  return '';
+}
+
+/**
+ * DEPRECATED: Retrieve a variable or state data property.
  *
  * @deprecated
  */
@@ -42,15 +86,149 @@ function _acquia_purge_get($name, $get_default = FALSE) {
 }
 
 /**
+ * DEPRECATED: Get a list of bal IP addresses in front of this site.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_balancers() {
+  _acquia_purge_deprecated('_acquia_purge_service()->hostingInfo()->getBalancerAddresses()');
+  return _acquia_purge_service()->hostingInfo()->getBalancerAddresses();
+}
+
+/**
+ * DEPRECATED: Calculate how many items can be purged during the
+ * execution of this script.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_capacity($subtract = NULL) {
+  _acquia_purge_deprecated('_acquia_purge_service()->capacity()->queueClaimsLimit()');
+  $limit = _acquia_purge_service()->capacity()->queueClaimsLimit();
+  if (!is_null($subtract)) {
+    _acquia_purge_service()->capacity()->queueClaimsSubtract($subtract);
+  }
+  return $limit;
+}
+
+/**
+ * DEPRECATED: Calculate the slowdown factor based on configuration.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_capacity_factor() {
+  _acquia_purge_deprecated('_acquia_purge_service()->capacity()->httpRequestsFactor()');
+  return _acquia_purge_service()->capacity()->httpRequestsFactor();
+}
+
+/**
+ * DEPRECATED: Calculate the maximum amount of outgoing HTTP requests we can
+ * make.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_capacity_maxrequests() {
+  _acquia_purge_deprecated('_acquia_purge_service()->capacity()->httpRequestsLimit()');
+  return _acquia_purge_service()->capacity()->httpRequestsLimit();
+}
+
+/**
+ * DEPRECATED: Perform a set of self-tests against the site.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_diagnosis($verbosity = ACQUIA_PURGE_SEVLEVEL_INFO) {
+  _acquia_purge_deprecated('_acquia_purge_service()->diagnostics()->get()');
+  return _acquia_purge_service()->diagnostics()->get($verbosity);
+}
+
+/**
+ * DEPRECATED: Log diagnostic test results to watchdog.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_diagnosis_logged(array $items, $deduplicate = TRUE) {
+  _acquia_purge_deprecated('_acquia_purge_service()->diagnostics()->log()');
+  return _acquia_purge_service()->diagnostics()->log($items, $deduplicate);
+}
+
+/**
+ * DEPRECATED: Get a list of defined domains that we can purge for.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_domains() {
+  _acquia_purge_deprecated('_acquia_purge_service()->hostingInfo()->getDomains()');
+  return _acquia_purge_service()->hostingInfo()->getDomains();
+}
+
+/**
+ * DEPRECATED: Add a domain to the domain list.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_domains_add($domain, array &$domains) {
+  _acquia_purge_deprecated('$domains[] = "new domain";');
+  $domains[] = $domain;
+}
+
+/**
+ * DEPRECATED: Get a list of protocol schemes that will be purged.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_protocol_schemes() {
+  _acquia_purge_deprecated('_acquia_purge_service()->hostingInfo()->getSchemes()');
+  return _acquia_purge_service()->hostingInfo()->getSchemes();
+}
+
+/**
+ * DEPRECATED: Determine the Acquia site name.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_site_name() {
+  _acquia_purge_deprecated('_acquia_purge_service()->hostingInfo()->getSiteName()');
+  return _acquia_purge_service()->hostingInfo()->getSiteName();
+}
+
+/**
+ * DEPRECATED: Determine the Acquia site group.
+ *
+ * @deprecated
+ */
+function _acquia_purge_get_site_group() {
+  _acquia_purge_deprecated('_acquia_purge_service()->hostingInfo()->getSiteGroup()');
+  return _acquia_purge_service()->hostingInfo()->getSiteGroup();
+}
+
+/**
+ * DEPRECATED: Purge a single path on all domains and load balancers.
+ *
+ * @deprecated
+ */
+function _acquia_purge_purge($path) {
+  _acquia_purge_deprecated('AcquiaPurgeExecutorAcquia->invalidate()');
+}
+
+/**
+ * DEPRECATED: Process the HTTP requests for a single purge.
+ *
+ * @deprecated
+ */
+function _acquia_purge_purge_requests($requests) {
+  _acquia_purge_deprecated('AcquiaPurgeExecutorInterface::requestsExecute()');
+}
+
+/**
  * DEPRECATED: Check if the current request path is blacklisted.
  *
  * @deprecated
  */
 function _acquia_purge_ui_path_blacklisted() {
-  _acquia_purge_deprecated('AcquiaPurgeAjaxProcessor::isPathBlacklisted()');
+  _acquia_purge_deprecated('AcquiaPurgeProcessorAjax::isPathBlacklisted()');
   return _acquia_purge_service()
     ->processors()
-    ->get('AcquiaPurgeAjaxProcessor')
+    ->get('AcquiaPurgeProcessorAjax')
     ->isPathBlacklisted();
 }
 
@@ -60,9 +238,9 @@ function _acquia_purge_ui_path_blacklisted() {
  * @deprecated
  */
 function _acquia_purge_ui_trigger_purge() {
-  _acquia_purge_deprecated('AcquiaPurgeAjaxProcessor::initializeClientSideProcessor()');
+  _acquia_purge_deprecated('AcquiaPurgeProcessorAjax::initializeClientSideProcessor()');
   // Call onInit, which will call initializeClientSideProcessor when it should.
-  _acquia_purge_service()->processors()->get('AcquiaPurgeAjaxProcessor')->onInit();
+  _acquia_purge_service()->processors()->get('AcquiaPurgeProcessorAjax')->onInit();
 }
 
 /**
@@ -126,10 +304,10 @@ function _acquia_purge_queue_history($url = NULL) {
  * @deprecated
  */
 function _acquia_purge_queue_is_user_purging() {
-  _acquia_purge_deprecated('AcquiaPurgeAjaxProcessor::isUserOwningTheQueue()');
+  _acquia_purge_deprecated('AcquiaPurgeProcessorAjax::isUserOwningTheQueue()');
   // Since ::isUserOwningTheQueue is static, call it through a small loophole.
   $service = _acquia_purge_service();
-  $ajaxprocessor = $service->processors()->get('AcquiaPurgeAjaxProcessor');
+  $ajaxprocessor = $service->processors()->get('AcquiaPurgeProcessorAjax');
   return $ajaxprocessor::isUserOwningTheQueue($service);
 }
 
@@ -154,11 +332,16 @@ function _acquia_purge_queue_lock($acquire = TRUE) {
  * @deprecated
  */
 function _acquia_purge_queue_pop($processor = NULL) {
-  _acquia_purge_deprecated('_acquia_purge_service()->process()');
-  if (is_null($processor)) {
-    $processor = '_acquia_purge_purge';
+  if (!is_null($processor)) {
+    _acquia_purge_deprecated(
+      '_acquia_purge_service()->process()',
+      '_acquia_purge_queue_pop($processor)'
+    );
   }
-  return _acquia_purge_service()->process($processor);
+  else {
+    _acquia_purge_deprecated('_acquia_purge_service()->process()');
+  }
+  return _acquia_purge_service()->process();
 }
 
 /**
@@ -177,8 +360,8 @@ function _acquia_purge_queue_processpurge($path) {
  * @deprecated
  */
 function _acquia_purge_queue_processpurge_requests($requests) {
-  _acquia_purge_deprecated('_acquia_purge_purge_requests()');
-  return _acquia_purge_purge_requests($requests);
+  _acquia_purge_deprecated('_acquia_purge_curl()');
+  return _acquia_purge_curl($requests);
 }
 
 /**
