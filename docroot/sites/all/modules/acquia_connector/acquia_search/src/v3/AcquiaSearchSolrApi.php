@@ -80,20 +80,25 @@ class AcquiaSearchSolrApi extends AcquiaSearchSolrApiBase implements AcquiaSearc
       $config_path = '/v2/indexes';
       $query = 'filter[network_id]=' . $this->subscription;
       $result = [];
+
+      $lock = 'acquia_search_get_search_indexes';
       $now = REQUEST_TIME;
-      while (!lock_acquire('acquia_search_get_search_indexes')) {
+
+      if (!lock_acquire($lock)) {
+        lock_wait($lock);
         // Throw an exception after X amount of seconds.
-        if (($now + self::REQUEST_TIMEOUT) < REQUEST_TIME) {
-          throw new \Exception("Couldn't acquire lock for 'acquia_search_get_search_indexes' in less than " . self::REQUEST_TIMEOUT . " seconds.");
+        if (!lock_acquire($lock)) {
+          throw new \Exception("Couldn't acquire lock for $lock in less than 30 seconds.");
         }
       }
+
       $indexes = $this->searchRequest($config_path, $query);
+      lock_release($lock);
       if (empty($indexes) && !is_array($indexes)) {
         // When API is not reachable, cache it for 1 minute.
         cache_set($cid, [], 'cache', $now + 60);
         return [];
       }
-      lock_release('acquia_search_get_search_indexes');
 
       foreach ($indexes['data'] as $index) {
         $result[$index['id']] = [
