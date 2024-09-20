@@ -1,29 +1,28 @@
 name: iiedmulti
-recipe: acquia
+recipe: drupal7
 config:
-  acli_version: latest
-  ah_application_uuid: 2201d573-ca9b-4833-8966-bb7531b99019
-  ah_site_group: iiedmulti
   php: '8.1'
-  drush: '8.4.10'
-  conf:
-    php: lando/php/php.ini
-    appserver:
+  drush: '8.4.12'
+  webroot: docroot
 proxy:
   appserver:
     - biocultural.lndo.site
-    - urbden.lndo.site
-    - ssm.lndo.site
+  mailhog:
+    - mail.iiedmulti.lndo.site
 services:
-  biocultural:
-    type: mysql:5.7
-    config:
-      confd: lando/mysql/conf.d
-  urbden:
-    type: mysql:5.7
-    config:
-      confd: lando/mysql/conf.d
-  ssm:
-    type: mysql:5.7
-    config:
-      confd: lando/mysql/conf.d
+  database:
+    type: mariadb:10.11
+    creds:
+      user: database
+      password: database
+      database: database
+  mailhog:
+    type: mailhog
+    hogfrom:
+      - appserver
+    portforward: true
+tooling:
+  drush:
+    service: appserver
+    cmd:
+      - 'drush --root=/app/docroot --uri=biocultural.lndo.site'
