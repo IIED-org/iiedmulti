@@ -7,5 +7,9 @@ settings.local.php
 # Ignore Mac files
 .DS_Store
 
-# Ignore .sql files
+# Ignore IDE files
+.idea
+
+# Ignore database dumps
 *.sql
+*.sql.gz
