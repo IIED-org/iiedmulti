@@ -562,6 +562,7 @@
   }
 
   Drupal.eu_cookie_compliance.rejectAllAction = function () {
+    Drupal.eu_cookie_compliance.setStatus(Drupal.eu_cookie_compliance.cookieValueDisagreed);
     Drupal.eu_cookie_compliance.setPreferenceCheckboxes([]);
     Drupal.eu_cookie_compliance.acceptAction();
   }

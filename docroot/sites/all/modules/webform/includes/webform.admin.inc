@@ -330,7 +330,9 @@ function webform_admin_content() {
   // webforms table.
   if (!webform_variable_get('webform_table')) {
     $view = views_get_view('webform_webforms');
-    return $view->preview('default');
+    if ($view) {
+      return $view->preview('default');
+    }
   }
 
   $query = db_select('webform', 'w');
