@@ -5,8 +5,8 @@ core = 7.x
 configure = admin/config/system/seckit
 files[] = seckit.test
 
-; Information added by Drupal.org packaging script on 2023-07-27
-version = "7.x-1.12"
+; Information added by Drupal.org packaging script on 2024-09-11
+version = "7.x-1.13"
 core = "7.x"
 project = "seckit"
-datestamp = "1690477673"
+datestamp = "1726048402"

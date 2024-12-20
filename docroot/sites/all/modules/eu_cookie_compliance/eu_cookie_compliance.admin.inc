@@ -506,13 +506,13 @@ function eu_cookie_compliance_admin_form(array $form, array $form_state) {
   $form['reject_button']['eu_cookie_compliance']['reject_button_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable "Reject/deny all" button'),
-    '#default_value' => $popup_settings['reject_button_enabled'],
+    '#default_value' => isset($popup_settings['reject_button_enabled']) ? $popup_settings['reject_button_enabled'] : FALSE,
   );
 
   $form['reject_button']['eu_cookie_compliance']['reject_button_label'] = array(
     '#type' => 'textfield',
     '#title' => t('Reject button label'),
-    '#default_value' => $popup_settings['reject_button_label'],
+    '#default_value' => isset($popup_settings['reject_button_label']) ? $popup_settings['reject_button_label'] : '',
     '#states' => array(
       'visible' => array(
         "input[name='eu_cookie_compliance[reject_button_enabled]']" => array('checked' => TRUE),
@@ -523,7 +523,7 @@ function eu_cookie_compliance_admin_form(array $form, array $form_state) {
   $form['reject_button']['eu_cookie_compliance']['close_button_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Close button/box enabled'),
-    '#default_value' => $popup_settings['close_button_enabled'],
+    '#default_value' => isset($popup_settings['close_button_enabled']) ? $popup_settings['close_button_enabled'] : FALSE,
   );
 
   $form['reject_button']['eu_cookie_compliance']['close_button_action'] = array(
@@ -535,7 +535,7 @@ function eu_cookie_compliance_admin_form(array $form, array $form_state) {
       'reject_all_cookies' => t('Reject all cookies'),
       'save_preferences' => t('Trigger Save preferences (for banner with categories)'),
     ),
-    '#default_value' => $popup_settings['close_button_action'],
+    '#default_value' => isset($popup_settings['close_button_action']) ? $popup_settings['close_button_action'] : 'close_banner',
     '#states' => array(
       'visible' => array(
         "input[name='eu_cookie_compliance[close_button_enabled]']" => array('checked' => TRUE),
@@ -780,7 +780,7 @@ function eu_cookie_compliance_admin_form(array $form, array $form_state) {
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
-    '#title' => t('EU countries'),
+    '#title' => t('EU, EEC countries and the UK'),
   );
 
   $form['eu_only']['eu_cookie_compliance'] = array(
@@ -816,7 +816,7 @@ function eu_cookie_compliance_admin_form(array $form, array $form_state) {
   }
   else {
     $form['eu_only']['info'] = array(
-      '#markup' => t('You can choose to show the banner only to visitors from EU countries. In order to achieve this, you need to install the <a href="http://drupal.org/project/geoip">geoip</a> module or the <a href="http://drupal.org/project/smart_ip">smart_ip</a> module or enable the <a href="http://www.php.net/manual/en/function.geoip-country-code-by-name.php">geoip_country_code_by_name()</a> PHP function.'),
+      '#markup' => t('You can choose to show the banner only to visitors from EU, EEC countries and the UK. In order to achieve this, you need to install the <a href="http://drupal.org/project/geoip">geoip</a> module or the <a href="http://drupal.org/project/smart_ip">smart_ip</a> module or enable the <a href="http://www.php.net/manual/en/function.geoip-country-code-by-name.php">geoip_country_code_by_name()</a> PHP function.'),
     );
   }
 

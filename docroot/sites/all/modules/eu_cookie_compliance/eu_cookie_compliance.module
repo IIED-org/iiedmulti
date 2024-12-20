@@ -688,6 +688,9 @@ function _eu_cookie_compliance_extract_category_key_label_description($string) {
  */
 function eu_cookie_compliance_get_settings($setting = 'all') {
   $popup_settings = variable_get('eu_cookie_compliance', array());
+  if (!is_array($popup_settings)) {
+    $popup_settings = array();
+  }
 
   // Ensure a default value exists for each setting.
   $popup_settings_dafaults = array(
@@ -740,8 +743,8 @@ function eu_cookie_compliance_user_in_eu() {
     $country_code = geoip_country_code();
   }
   elseif (module_exists('smart_ip')) {
-    $smart_ip_session = smart_ip_session_get('smart_ip');
-    $country_code = isset($smart_ip_session['location']['country_code']) ? $smart_ip_session['location']['country_code'] : NULL;
+    $smart_ip_session = smart_ip_get_location(ip_address());
+    $country_code = isset($smart_ip_session['country_code']) ? $smart_ip_session['country_code'] : NULL;
   }
 
   // If the CloudFlare provided country header is available, use it as a
@@ -834,27 +837,21 @@ function eu_cookie_compliance_js_alter(&$javascript) {
 
     if ($path_is_excluded === FALSE) {
       foreach ($disabled_javascripts as $script) {
+        // Remove 'category:' if present.
+        $parts = explode(':', $script, 2);
+        // If the string after the colon starts with two slashes, it is not a
+        // category but the schema of an absolute link.
+        if (!empty($parts[1]) && strpos($parts[1], '//') !== 0) {
+          $script = $parts[1];
+        }
+        // Parse the string and drop the parameter that is a behavior name.
+        if (strpos($script, '|') !== FALSE) {
+          @list($script) = explode('|', $script);
+        }
+
         // https://www.drupal.org/project/eu_cookie_compliance/issues/3205742
         // Only add the script if it's actually present in the page scripts.
         if (array_key_exists($script, $javascript)) {
-          // Remove 'category:' if present.
-          $parts = explode(':', $script);
-          // Deal with absolute links with category.
-          if (!empty($parts[2]) && strpos($parts[2], '//') === 0) {
-            array_shift($parts);
-            $script = implode(':', $parts);
-          }
-          // Deal with relative links.
-          else {
-            if (!empty($parts[1]) && strpos($parts[1], '//') !== 0) {
-              $script = end($parts);
-            }
-          }
-          // Parse the string and drop the parameter that is a behavior name.
-          if (strpos($script, '|') !== FALSE) {
-            @list($script) = explode('|', $script);
-          }
-
           unset($javascript[$script]);
         }
         elseif ($js_disabled_script_position !== FALSE) {
